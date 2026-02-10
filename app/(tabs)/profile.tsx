@@ -1,29 +1,31 @@
-import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from 'react-native';
-import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/auth';
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  Calendar, 
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import {
+  Calendar,
+  ChevronRight,
   Crown,
   LogOut,
-  ChevronRight,
+  Mail,
+  Phone,
+  User,
 } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
   const router = useRouter();
-
+  const navigate = (path: string) => {
+    router.push(path);
+  };
   const handleLogout = () => {
     Alert.alert(
       'Logout',
@@ -178,7 +180,7 @@ export default function ProfileScreen() {
             activeOpacity={0.8}
           >
             <LogOut size={20} color="#ff3b30" />
-            <Text style={styles.logoutButtonText}>Logout</Text>
+            <Text style={styles.logoutButtonText} onPress={() => navigate("/login")}>Logout</Text>
           </TouchableOpacity>
 
           <View style={styles.bottomPadding} />

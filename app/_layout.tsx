@@ -1,53 +1,63 @@
-// template
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+  // app/_layout.tsx
+  import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { AuthContext, useAuth } from "@/contexts/auth";
 
-SplashScreen.preventAutoHideAsync();
+  import { AuthContext, useAuth } from "@/contexts/auth";
 
-const queryClient = new QueryClient();
+  SplashScreen.preventAutoHideAsync();
+  const queryClient = new QueryClient();
+  function RootLayoutNav() {
+    const { user, isLoading } = useAuth();
+    const segments = useSegments();
+    const router = useRouter();
 
-function RootLayoutNav() {
-  const { user, isLoading } = useAuth();
-  const segments = useSegments();
-  const router = useRouter();
+    useEffect(() => {
+      if (isLoading) return;
 
-  useEffect(() => {
-    if (isLoading) return;
+      const inTabs = segments[0] === "(tabs)";
 
-    const inAuthGroup = segments[0] === '(tabs)';
+      if (!user && inTabs) {
+        router.replace("/login");
+      } else if (user && !inTabs) {
+        router.replace("/(tabs)");
+      }
+    }, [user, segments, isLoading]);
 
-    if (!user && inAuthGroup) {
-      router.replace('/login');
-    } else if (user && !inAuthGroup) {
-      router.replace('/(tabs)');
-    }
-  }, [user, segments, isLoading]);
+    return (
+      <Stack screenOptions={{ headerBackTitle: "Back" }}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="signup" options={{ headerShown: false }} />
+      </Stack>
+    );
+  }
 
-  return (
-    <Stack screenOptions={{ headerBackTitle: "Back" }}>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="login" options={{ headerShown: false }} />
-      <Stack.Screen name="signup" options={{ headerShown: false }} />
-    </Stack>
-  );
-}
+  export default function RootLayout() {
+    // const [fontsLoaded] = useFonts({
+    //   Inter_400Regular,
+    //   Inter_500Medium,
+    //   Inter_600SemiBold,
+    //   Inter_700Bold,
+    // });
 
-export default function RootLayout() {
-  useEffect(() => {
-    SplashScreen.hideAsync();
-  }, []);
+    // useEffect(() => {
+    //   if (fontsLoaded) {
+    //     SplashScreen.hideAsync();
+    //   }
+    // }, [fontsLoaded]);
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AuthContext>
-        <GestureHandlerRootView>
-          <RootLayoutNav />
-        </GestureHandlerRootView>
-      </AuthContext>
-    </QueryClientProvider>
-  );
-}
+    // if (!fontsLoaded) return null;
+
+    return (
+      <QueryClientProvider client={queryClient}>
+        <AuthContext>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <RootLayoutNav />
+          </GestureHandlerRootView>
+        </AuthContext>
+      </QueryClientProvider>
+    );
+  }
