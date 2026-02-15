@@ -1,64 +1,48 @@
-  // app/_layout.tsx
-  import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Stack, useRouter, useSegments } from "expo-router";
+// app/_layout.tsx
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-  import { AuthContext, useAuth } from "@/contexts/auth";
+import { AuthContext, useAuth } from "@/contexts/auth";
 
-  SplashScreen.preventAutoHideAsync();
-  const queryClient = new QueryClient();
-  function RootLayoutNav() {
-    const { user, isLoading } = useAuth();
-    const segments = useSegments();
-    const router = useRouter();
+SplashScreen.preventAutoHideAsync();
 
-    useEffect(() => {
-      if (isLoading) return;
+const queryClient = new QueryClient();
 
-      const inTabs = segments[0] === "(tabs)";
+function RootLayoutNav() {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
 
-      if (!user && inTabs) {
-        router.replace("/login");
-      } else if (user && !inTabs) {
-         router.replace("/(tabs)");
-       
-      }
-    }, [user, segments, isLoading]);
+  useEffect(() => {
+    if (isLoading) return;
+    SplashScreen.hideAsync();
+    if (!user) {
+      router.replace("/login");
+    } else {
+      router.replace("/(tabs)");
+    }
+  }, [user, isLoading]);
 
-    return (
-      <Stack screenOptions={{ headerBackTitle: "Back" }}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="login" options={{ headerShown: false }} />
-        <Stack.Screen name="signup" options={{ headerShown: false }} />
-      </Stack>
-    );
-  }
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="login" />
+      <Stack.Screen name="signup" />
+      <Stack.Screen name="(tabs)" />
+    </Stack>
+  );
+}
 
-  export default function RootLayout() {
-    // const [fontsLoaded] = useFonts({
-    //   Inter_400Regular,
-    //   Inter_500Medium,
-    //   Inter_600SemiBold,
-    //   Inter_700Bold,
-    // });
-
-    // useEffect(() => {
-    //   if (fontsLoaded) {
-    //     SplashScreen.hideAsync();
-    //   }
-    // }, [fontsLoaded]);
-
-    // if (!fontsLoaded) return null;
-
-    return (
-      <QueryClientProvider client={queryClient}>
-        <AuthContext>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <RootLayoutNav />
-          </GestureHandlerRootView>
-        </AuthContext>
-      </QueryClientProvider>
-    );
-  }
+export default function RootLayout() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      {/* ✅ THIS IS CORRECT FOR create-context-hook */}
+      <AuthContext>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <RootLayoutNav />
+        </GestureHandlerRootView>
+      </AuthContext>
+    </QueryClientProvider>
+  );
+}
