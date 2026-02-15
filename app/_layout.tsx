@@ -22,7 +22,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
       if (!user && inTabs) {
         router.replace("/login");
       } else if (user && !inTabs) {
-        router.replace("/(tabs)");
+         router.replace("/(tabs)");
+       
       }
     }, [user, segments, isLoading]);
 

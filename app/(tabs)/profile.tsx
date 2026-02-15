@@ -24,7 +24,7 @@ export default function ProfileScreen() {
   const { user, logout } = useAuth();
   const router = useRouter();
   const navigate = (path: string) => {
-    router.push(path);
+    router.replace("/login");
   };
   const handleLogout = () => {
     Alert.alert(
