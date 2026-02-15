@@ -2,16 +2,21 @@
   "expo": {
     "name": "GYMbook",
     "slug": "GYMbook",
-    "version": "1.0.0",
+    "version": "1.0.3",
+
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "gymbook",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "buildNumber": "3"
     },
+
     "android": {
+      "versionCode": 3,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -22,10 +27,12 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.manikandancse36.GYMbook"
     },
+
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
+
     "plugins": [
       "expo-router",
       [
@@ -42,10 +49,12 @@
       ],
       "expo-font"
     ],
+
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
     },
+
     "extra": {
       "router": {},
       "eas": {
