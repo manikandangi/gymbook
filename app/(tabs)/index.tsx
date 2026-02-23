@@ -130,26 +130,6 @@ const ReportItem = ({ label, value }: any) => (
   </View>
 );
 
-// const NavItem = ({ icon, label, active }: any) => (
-//   <View style={styles.navItem}>
-//     <Ionicons
-//       name={icon}
-//       size={22}
-//       color={active ? "#0B1F4B" : "#9CA3AF"}
-//     />
-//     <Text
-//       style={[
-//         styles.navLabel,
-//         active && { color: "#0B1F4B" },
-//       ]}
-//     >
-//       {label}
-//     </Text>
-//   </View>
-// );
-
-/* ================= STYLES ================= */
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F5F6FA" },
 

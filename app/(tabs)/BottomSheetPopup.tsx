@@ -114,11 +114,10 @@ const SheetContent = ({ closeSheet }: { closeSheet: () => void }) => {
       <Text style={styles.section}>Other Actions</Text>
 
       <View style={styles.actionCard}>
-        <ActionItem label="Manage Staff" />
-        <ActionItem label="Manage Plans" />
-        <ActionItem label="View All Leads" />
-        <ActionItem label="Manage Expenses" />
-        <ActionItem label="Contact us." />
+        <ActionItem label="Manage Staff" onPress={() => navigate("/(tabs)/ManageStaff")}/>
+        <ActionItem label="Manage Plans" onPress={() => navigate("/(tabs)/ManagePlans")}/>
+        <ActionItem label="View All Leads" onPress={() => navigate("/(tabs)/PotentialLeads")}/>
+        <ActionItem label="Manage Expenses" onPress={() => navigate("/(tabs)/ExpensesScreen")}/>
       </View>
     </View>
   );
@@ -142,9 +141,16 @@ const MenuItem = ({
     <Text style={styles.menuText}>{label}</Text>
   </TouchableOpacity>
 );
+interface ActionItemProps {
+  label: string;
+  onPress?: () => void;
+}
 
-const ActionItem = ({ label }: { label: string }) => (
-  <TouchableOpacity style={styles.actionItem}>
+const ActionItem: React.FC<ActionItemProps> = ({
+  label,
+  onPress,
+}) => (
+  <TouchableOpacity style={styles.actionItem} onPress={onPress}>
     <Text style={styles.actionText}>{label}</Text>
     <Text style={styles.arrow}>›</Text>
   </TouchableOpacity>
