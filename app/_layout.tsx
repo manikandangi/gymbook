@@ -1,9 +1,9 @@
-// app/_layout.tsx
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import "react-native-reanimated";
 
 import { AuthContext, useAuth } from "@/contexts/auth";
 
@@ -18,6 +18,7 @@ function RootLayoutNav() {
   useEffect(() => {
     if (isLoading) return;
     SplashScreen.hideAsync();
+
     if (!user) {
       router.replace("/login");
     } else {
@@ -36,13 +37,12 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   return (
-    <QueryClientProvider client={queryClient}>
-      {/* ✅ THIS IS CORRECT FOR create-context-hook */}
-      <AuthContext>
-        <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <AuthContext>
           <RootLayoutNav />
-        </GestureHandlerRootView>
-      </AuthContext>
-    </QueryClientProvider>
+        </AuthContext>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }

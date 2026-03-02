@@ -23,12 +23,9 @@ export default function BottomSheetWithFAB() {
   const [webVisible, setWebVisible] = useState(false);
 
   const openSheet = useCallback(() => {
-    if (Platform.OS === "web") {
-      setWebVisible(true);
-    } else {
-      sheetRef.current?.snapToIndex(0);
-    }
-  }, []);
+  console.log("Opening sheet");
+  sheetRef.current?.expand(); // try expand instead
+}, []);
 
   const closeSheet = () => {
     if (Platform.OS === "web") {

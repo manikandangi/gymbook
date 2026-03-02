@@ -1,8 +1,9 @@
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
+  Alert,
+  Image,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -12,224 +13,223 @@ import {
   View,
 } from "react-native";
 
-const AddStaffScreen: React.FC = () => {
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { db, storage } from "../../firebase/firebaseConfig";
+
+const AddMemberScreen = () => {
   const router = useRouter();
+
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [dob, setDob] = useState("");
+  const [gender, setGender] = useState<"Male" | "Female">("Male");
+  const [bloodGroup, setBloodGroup] = useState("");
+  const [address, setAddress] = useState("");
+  const [notes, setNotes] = useState("");
+
+  const [userImage, setUserImage] = useState<string | null>(null);
+  const [idCardImage, setIdCardImage] = useState<string | null>(null);
+
+  // Pick Image
+  const pickImage = async (type: "user" | "id") => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      if (type === "user") setUserImage(result.assets[0].uri);
+      else setIdCardImage(result.assets[0].uri);
+    }
+  };
+
+  // Upload image to Firebase Storage
+  const uploadImage = async (uri: string, path: string) => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+
+    const storageRef = ref(storage, path);
+    await uploadBytes(storageRef, blob);
+    return await getDownloadURL(storageRef);
+  };
+
+  const handleSave = async () => {
+    if (!name || !phone) {
+      Alert.alert("Error", "Name and Phone are required");
+      return;
+    }
+
+    try {
+      let userImageUrl = "";
+      let idCardUrl = "";
+
+      if (userImage) {
+        userImageUrl = await uploadImage(
+          userImage,
+          `members/user_${Date.now()}`
+        );
+      }
+
+      if (idCardImage) {
+        idCardUrl = await uploadImage(
+          idCardImage,
+          `members/id_${Date.now()}`
+        );
+      }
+
+      await addDoc(collection(db, "members"), {
+        name,
+        phone,
+        email,
+        dob,
+        gender,
+        bloodGroup,
+        address,
+        notes,
+        userImageUrl,
+        idCardUrl,
+        createdAt: serverTimestamp(),
+      });
+
+      Alert.alert("Success", "Member added successfully");
+      router.back();
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Something went wrong");
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
-        <ScrollView
-          contentContainerStyle={styles.container}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header */}
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.back()}>
-              <Text style={styles.close}>✕</Text>
-            </TouchableOpacity>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>New Member</Text>
 
-            <Text style={styles.headerTitle}>Add Members</Text>
+        <TextInput
+          placeholder="Enter name"
+          style={styles.input}
+          value={name}
+          onChangeText={setName}
+        />
 
-            {/* spacer for center alignment */}
-            <View style={{ width: 24 }} />
+        <View style={styles.row}>
+          <View style={styles.codeBox}>
+            <Text>+91</Text>
           </View>
-
-          {/* Profile Image */}
-          <View style={styles.imageWrapper}>
-            <View style={styles.imageCircle}>
-              <Text style={styles.imageIcon}>🖼️</Text>
-            </View>
-            <Text style={styles.changeText}>Change</Text>
-          </View>
-
-          {/* Full Name */}
-          <Text style={styles.label}>Full Name</Text>
           <TextInput
-            placeholder="Enter name"
-            placeholderTextColor="#9CA3AF"
-            style={styles.input}
+            placeholder="Phone"
+            style={[styles.input, { flex: 1 }]}
+            keyboardType="phone-pad"
+            value={phone}
+            onChangeText={setPhone}
           />
+        </View>
 
-          {/* Email */}
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            placeholder="Enter email"
-            placeholderTextColor="#9CA3AF"
-            style={styles.input}
-            keyboardType="email-address"
-          />
+        <TextInput
+          placeholder="Email"
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+        />
 
-          {/* Phone */}
-          <View style={styles.row}>
-            <View style={styles.codeBox}>
-              <Text style={styles.codeText}>+91</Text>
-            </View>
-            <TextInput
-              placeholder="Enter Phone Number"
-              placeholderTextColor="#9CA3AF"
-              style={[styles.input, styles.phoneInput]}
-              keyboardType="phone-pad"
-            />
-          </View>
+        <TextInput
+          placeholder="Address"
+          style={[styles.input, { height: 80 }]}
+          value={address}
+          onChangeText={setAddress}
+          multiline
+        />
 
-          {/* Role */}
-          <Text style={styles.label}>Role</Text>
-          <TouchableOpacity style={styles.dropdown}>
-            <Text style={styles.dropdownText}>Please Select</Text>
-            <Text style={styles.dropdownIcon}>⌄</Text>
+        <TextInput
+          placeholder="Notes"
+          style={[styles.input, { height: 100 }]}
+          value={notes}
+          onChangeText={setNotes}
+          multiline
+        />
+
+        {/* Images */}
+        <View style={styles.imageRow}>
+          <TouchableOpacity
+            style={styles.imageBox}
+            onPress={() => pickImage("user")}
+          >
+            {userImage ? (
+              <Image source={{ uri: userImage }} style={styles.image} />
+            ) : (
+              <Text>No User Image</Text>
+            )}
           </TouchableOpacity>
 
-          {/* Spacer */}
-          <View style={{ flex: 1 }} />
-
-          {/* Save Button */}
-          <TouchableOpacity style={styles.saveButton}>
-            <Text style={styles.saveText}>Save</Text>
+          <TouchableOpacity
+            style={styles.imageBox}
+            onPress={() => pickImage("id")}
+          >
+            {idCardImage ? (
+              <Image source={{ uri: idCardImage }} style={styles.image} />
+            ) : (
+              <Text>No ID Card</Text>
+            )}
           </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </View>
+
+        <TouchableOpacity style={styles.button} onPress={handleSave}>
+          <Text style={styles.buttonText}>Add new member</Text>
+        </TouchableOpacity>
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
-export default AddStaffScreen;
-
-/* ===================================================== */
-/* STYLES */
-/* ===================================================== */
+export default AddMemberScreen;
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-  },
-
-  container: {
-    flexGrow: 1,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginVertical: 12,
-  },
-
-  close: {
-    fontSize: 20,
-    color: "#000",
-  },
-
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#000",
-  },
-
-  imageWrapper: {
-    alignItems: "center",
-    marginVertical: 20,
-  },
-
-  imageCircle: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: "#E9EEF5",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  imageIcon: {
-    fontSize: 28,
-  },
-
-  changeText: {
-    marginTop: 8,
-    color: "#000",
-    fontSize: 14,
-  },
-
-  label: {
-    fontSize: 14,
-    color: "#000",
-    marginBottom: 6,
-    marginTop: 12,
-  },
-
+  safe: { flex: 1, backgroundColor: "#F5F6F8" },
+  container: { padding: 20 },
+  title: { fontSize: 18, fontWeight: "600", marginBottom: 20 },
   input: {
-    backgroundColor: "#E9EEF5",
+    backgroundColor: "#E6EAF0",
     borderRadius: 10,
-    paddingHorizontal: 14,
+    paddingHorizontal: 15,
     height: 50,
-    fontSize: 14,
-    color: "#000",
+    marginTop: 12,
   },
-
-  row: {
-    flexDirection: "row",
+  row: { flexDirection: "row", gap: 10 },
+  codeBox: {
+    width: 70,
+    height: 50,
+    backgroundColor: "#E6EAF0",
+    borderRadius: 10,
+    justifyContent: "center",
     alignItems: "center",
     marginTop: 12,
   },
-
-  codeBox: {
-    width: 64,
-    height: 50,
-    backgroundColor: "#E9EEF5",
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 10,
-  },
-
-  codeText: {
-    fontSize: 14,
-    color: "#000",
-  },
-
-  phoneInput: {
-    flex: 1,
-  },
-
-  dropdown: {
-    height: 50,
-    backgroundColor: "#E9EEF5",
-    borderRadius: 10,
-    paddingHorizontal: 14,
+  imageRow: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 6,
+    marginTop: 20,
   },
-
-  dropdownText: {
-    fontSize: 14,
-    color: "#9CA3AF",
-  },
-
-  dropdownIcon: {
-    fontSize: 16,
-    color: "#000",
-  },
-
-  saveButton: {
-    backgroundColor: "#0A1E5E",
-    height: 54,
-    borderRadius: 12,
-    alignItems: "center",
+  imageBox: {
+    width: "48%",
+    height: 120,
+    backgroundColor: "#E6EAF0",
+    borderRadius: 10,
     justifyContent: "center",
+    alignItems: "center",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 10,
+  },
+  button: {
+    backgroundColor: "#0A1E5E",
+    height: 55,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 30,
   },
-
-  saveText: {
-    color: "#FFF",
-    fontSize: 16,
-    fontWeight: "600",
-  },
+  buttonText: { color: "#FFF", fontWeight: "600", fontSize: 16 },
 });
