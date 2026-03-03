@@ -1,9 +1,13 @@
+// app/_layout.tsx
+
+import "react-native-reanimated"; // MUST BE FIRST
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import "react-native-reanimated";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { AuthContext, useAuth } from "@/contexts/auth";
 
@@ -17,6 +21,7 @@ function RootLayoutNav() {
 
   useEffect(() => {
     if (isLoading) return;
+
     SplashScreen.hideAsync();
 
     if (!user) {
@@ -38,11 +43,13 @@ function RootLayoutNav() {
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <QueryClientProvider client={queryClient}>
-        <AuthContext>
-          <RootLayoutNav />
-        </AuthContext>
-      </QueryClientProvider>
+      <SafeAreaProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthContext>
+            <RootLayoutNav />
+          </AuthContext>
+        </QueryClientProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
