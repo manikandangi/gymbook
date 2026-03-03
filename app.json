@@ -30,6 +30,7 @@
 
     "web": {
       "output": "static",
+      "baseUrl": "/gymbook/",
       "favicon": "./assets/images/favicon.png"
     },
 
