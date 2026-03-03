@@ -22,11 +22,13 @@ export default function BottomSheetWithFAB() {
   const snapPoints = useMemo(() => ["65%"], []);
   const [webVisible, setWebVisible] = useState(false);
 
-  const openSheet = useCallback(() => {
-  console.log("Opening sheet");
-  sheetRef.current?.expand(); // try expand instead
+ const openSheet = useCallback(() => {
+  if (Platform.OS === "web") {
+    setWebVisible(true);
+  } else {
+    sheetRef.current?.expand();
+  }
 }, []);
-
   const closeSheet = () => {
     if (Platform.OS === "web") {
       setWebVisible(false);
