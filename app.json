@@ -3,7 +3,6 @@
     "name": "GYMbook",
     "slug": "GYMbook",
     "version": "1.0.5",
-
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "gymbook",
@@ -30,7 +29,6 @@
 
     "web": {
       "output": "static",
-      "baseUrl": "/gymbook/",
       "favicon": "./assets/images/favicon.png"
     },
 
@@ -57,7 +55,9 @@
     },
 
     "extra": {
-      "router": {},
+      "router": {
+        "basePath": "/gymbook"
+      },
       "eas": {
         "projectId": "5267a7ae-d866-4595-ae46-a626b77b6624"
       }
