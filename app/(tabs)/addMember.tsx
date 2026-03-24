@@ -1,3 +1,4 @@
+import { createClient } from "@supabase/supabase-js";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -13,11 +14,8 @@ import {
   View,
 } from "react-native";
 
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { db, storage } from "../../firebase/firebaseConfig";
-
 const AddMemberScreen = () => {
+  debugger;
   const router = useRouter();
 
   const [name, setName] = useState("");
@@ -45,17 +43,9 @@ const AddMemberScreen = () => {
     }
   };
 
-  // Upload image to Firebase Storage
-  const uploadImage = async (uri: string, path: string) => {
-    const response = await fetch(uri);
-    const blob = await response.blob();
-
-    const storageRef = ref(storage, path);
-    await uploadBytes(storageRef, blob);
-    return await getDownloadURL(storageRef);
-  };
 
   const handleSave = async () => {
+    debugger;
     if (!name || !phone) {
       Alert.alert("Error", "Name and Phone are required");
       return;
@@ -65,38 +55,39 @@ const AddMemberScreen = () => {
       let userImageUrl = "";
       let idCardUrl = "";
 
-      if (userImage) {
-        userImageUrl = await uploadImage(
-          userImage,
-          `members/user_${Date.now()}`
-        );
-      }
-
-      if (idCardImage) {
-        idCardUrl = await uploadImage(
-          idCardImage,
-          `members/id_${Date.now()}`
-        );
-      }
-
-      await addDoc(collection(db, "members"), {
-        name,
-        phone,
-        email,
-        dob,
-        gender,
-        bloodGroup,
-        address,
-        notes,
-        userImageUrl,
-        idCardUrl,
-        createdAt: serverTimestamp(),
+      const supabaseUrl = "https://vihsrmhbzlejvueultdq.supabase.co";
+      const supabaseKey = "sb_publishable_HMy-TLDNjSGsWNrgFIRhHw_O_0wJjYb";
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      const { data, error } = await supabase.rpc("ufn_create_member", {
+        in_member_code: `MBR_${Date.now()}`, // generate or pass your own
+        in_first_name: name,
+        in_last_name: "", // split if needed
+        in_gender: gender || "",
+        in_dob: dob || null,
+        in_phone: phone,
+        in_email: email || "",
+        in_address: address || "",
+        in_city: "",       // fill if available
+        in_state: "",      // fill if available
+        in_pincode: "",    // fill if available
+        in_membership_type: "REGULAR", // or dynamic
+        in_height: null,   // pass number if available
+        in_weight: null,
+        in_emg_name: "",
+        in_emg_phone: "",
       });
 
-      Alert.alert("Success", "Member added successfully");
+      if (error) {
+        console.log("Supabase error:", error);
+        alert(error);
+        return;
+      }
+      debugger;
+      console.log("Success:", data);
+      alert(data);
       router.back();
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log("Unexpected error:", err);
       Alert.alert("Error", "Something went wrong");
     }
   };

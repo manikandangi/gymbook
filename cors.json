@@ -1,0 +1,11 @@
+[
+  {
+    "origin": [
+      "http://localhost:19006",
+      "https://manikandangi.github.io"
+    ],
+    "method": ["GET", "POST", "PUT", "DELETE"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": ["Content-Type", "Authorization"]
+  }
+]

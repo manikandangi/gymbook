@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -11,16 +12,34 @@ import {
 } from "react-native";
 
 export default function LoginScreen() {
+  debugger;
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  const handleLogin = () => {
-    // ✅ navigate to tabs index
-    router.replace("/(tabs)");
+  const handleLogin = async () => {
+    debugger;
+    const supabaseUrl = "https://vihsrmhbzlejvueultdq.supabase.co";
+    const supabaseKey = "sb_publishable_HMy-TLDNjSGsWNrgFIRhHw_O_0wJjYb";
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const { data, error } = await supabase.rpc("app_login_v1", {
+      in_mobileno: email,
+      in_password: password,
+      in_ipaddress: "127.0.0.1",
+    });
+    if (error) {
+      alert(error);
+    } else {
+      const dataed = data.split('~');
+      if (dataed[0] == "0") {
+        router.replace("/(tabs)");
+      }
+      else {
+        alert(dataed[1]);
+        router.replace("/(tabs)");
+      }
+    }
   };
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
