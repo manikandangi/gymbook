@@ -1,19 +1,47 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from 'expo-router';
-import React from "react";
+import { createClient } from "@supabase/supabase-js";
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 
 export default function HomeScreen() {
-  const router = useRouter();  
-    const navigate = (path: string) => {
-      router.push(path);
-    };
+  const router = useRouter();
+
+  const [dashboard, setDashboard] = useState<any>({});
+  const [loading, setLoading] = useState(false);
+
+  const navigate = (path: string) => {
+    router.push(path);
+  };
+
+  useEffect(() => {
+    fetchDashboard();
+  }, []);
+
+  const fetchDashboard = async () => {
+    setLoading(true);
+    const supabaseUrl = "https://vihsrmhbzlejvueultdq.supabase.co";
+    const supabaseKey = "sb_publishable_HMy-TLDNjSGsWNrgFIRhHw_O_0wJjYb";
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const { data, error } = await supabase.rpc("ufn_member_dashboard");
+
+    if (error) {
+      console.log("Dashboard error:", error);
+      setLoading(false);
+      return;
+    }
+    console.log(data);
+    setDashboard(data || {});
+    setLoading(false);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -21,7 +49,12 @@ export default function HomeScreen() {
         <Text style={styles.headerTitle}>Unique Fitness</Text>
         <View style={styles.headerIcons}>
           <Ionicons name="call-outline" size={22} style={styles.icon} />
-          <Ionicons name="settings-outline" size={22} style={styles.icon} onPress={() => navigate("/(tabs)/profile")}/>
+          <Ionicons
+            name="settings-outline"
+            size={22}
+            style={styles.icon}
+            onPress={() => navigate("/(tabs)/profile")}
+          />
         </View>
       </View>
 
@@ -30,25 +63,34 @@ export default function HomeScreen() {
         <View style={styles.row}>
           <StatCard
             label="Active Members"
-            value="59"
+            value={dashboard["active_members"] || 0}
             colors={["#3B82F6", "#2563EB"]}
-            href="/(tabs)/member"
+            onPress={() => navigate("/(tabs)/member")}
           />
           <StatCard
             label="Expired in 30 days"
-            value="5"
+            value={dashboard["expiring_in_30_days"] || 0}
             colors={["#EF4444", "#DC2626"]}
-            href="/(tabs)/member"
+            onPress={() => navigate("/(tabs)/member")}
           />
         </View>
 
         <View style={styles.row}>
-          <WhiteCard label="Expiring in 10 days" value="33" highlight />
-          <WhiteCard label="Total Members" value="65" />
+          <WhiteCard
+            label="Expiring in 10 days"
+            value={dashboard["expiring_in_10_days"] || 0}
+            highlight
+             onPress={() => navigate("/(tabs)/member")}
+          />
+          <WhiteCard
+            label="Total Members"
+            value={dashboard["total_members"] || 0}
+             onPress={() => navigate("/(tabs)/member")}
+          />
         </View>
 
         <View style={styles.singleRow}>
-          <WhiteCard label="Today's Leads" value="0" />
+          <WhiteCard label="Today's Leads" value={dashboard["expired_members"] || 0} />
         </View>
 
         {/* Quick Reports */}
@@ -87,24 +129,26 @@ export default function HomeScreen() {
           <Text style={styles.muted}>No member with balance</Text>
         </View>
       </ScrollView>
-      
     </SafeAreaView>
   );
 }
-const StatCard = ({ label, value, colors }: any) => (
-  <View style={[styles.statCard, { backgroundColor: colors[0] }]}>
+
+const StatCard = ({ label, value, colors, onPress }: any) => (
+  <TouchableOpacity
+    style={[styles.statCard, { backgroundColor: colors[0] }]}
+    onPress={onPress}
+  >
     <View>
       <Text style={styles.statLabel}>{label}</Text>
       <Text style={styles.statValue}>{value}</Text>
     </View>
 
-    <View style={styles.statArrow}>
-      <Ionicons name="chevron-forward" size={16} color="#fff" href="/(tabs)/member" />
-    </View>
-  </View>
+    <Ionicons name="chevron-forward" size={16} color="#fff" />
+  </TouchableOpacity>
 );
+
 const WhiteCard = ({ label, value, highlight }: any) => (
-  <View style={styles.whiteCard} >
+  <View style={styles.whiteCard}>
     <View>
       <Text style={styles.whiteLabel}>{label}</Text>
       <Text
@@ -118,7 +162,7 @@ const WhiteCard = ({ label, value, highlight }: any) => (
     </View>
 
     <View style={styles.arrowBox}>
-      <Ionicons name="chevron-forward" size={16} color="#6B7280"/>
+      <Ionicons name="chevron-forward" size={16} color="#6B7280" />
     </View>
   </View>
 );
@@ -158,10 +202,6 @@ const styles = StyleSheet.create({
   },
   statLabel: { color: "#E5E7EB", fontSize: 13 },
   statValue: { fontSize: 28, fontWeight: "700", color: "#fff" },
-  statArrow: {   
-    alignItems: "flex-end",
-    justifyContent: "flex-end",
-  },
 
   whiteCard: {
     flex: 1,
@@ -182,6 +222,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
     color: "#111827",
   },
+
   arrowBox: {
     width: 28,
     height: 28,
@@ -203,11 +244,14 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
   },
+
   reportHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
+
   reportDate: { fontSize: 13, color: "#6B7280" },
+
   dropdown: {
     flexDirection: "row",
     alignItems: "center",
@@ -216,6 +260,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 10,
   },
+
   dropdownText: { fontSize: 13, marginRight: 4 },
 
   reportRow: { flexDirection: "row", marginTop: 16 },
@@ -226,25 +271,19 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
   },
+
   balanceHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
+
   badge: {
     backgroundColor: "#0B1F4B",
     borderRadius: 12,
     paddingHorizontal: 8,
   },
-  badgeText: { color: "#fff", fontSize: 12 },
-  muted: { color: "#9CA3AF", marginTop: 8 },
 
-  bottomNav: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 10,
-    backgroundColor: "#fff",
-    overflow: "visible",
-  },
-  navItem: { alignItems: "center" },
-  navLabel: { fontSize: 11, color: "#9CA3AF" },
+  badgeText: { color: "#fff", fontSize: 12 },
+
+  muted: { color: "#9CA3AF", marginTop: 8 },
 });

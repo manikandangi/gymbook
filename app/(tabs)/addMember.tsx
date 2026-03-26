@@ -1,94 +1,111 @@
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { createClient } from "@supabase/supabase-js";
-import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
-  Image,
+  Keyboard,
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 const AddMemberScreen = () => {
-  debugger;
   const router = useRouter();
 
+  // Basic
   const [name, setName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+
+  // DOB
   const [dob, setDob] = useState("");
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
   const [gender, setGender] = useState<"Male" | "Female">("Male");
-  const [bloodGroup, setBloodGroup] = useState("");
+
+  // Address
   const [address, setAddress] = useState("");
-  const [notes, setNotes] = useState("");
+  const [city, setCity] = useState("");
+  const [stateName, setStateName] = useState("");
+  const [pincode, setPincode] = useState("");
 
-  const [userImage, setUserImage] = useState<string | null>(null);
-  const [idCardImage, setIdCardImage] = useState<string | null>(null);
+  // Extra
+  const [membershipType, setMembershipType] = useState("REGULAR");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
 
-  // Pick Image
-  const pickImage = async (type: "user" | "id") => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.7,
-    });
+  // Emergency
+  const [emgName, setEmgName] = useState("");
+  const [emgPhone, setEmgPhone] = useState("");
 
-    if (!result.canceled) {
-      if (type === "user") setUserImage(result.assets[0].uri);
-      else setIdCardImage(result.assets[0].uri);
-    }
-  };
-
+  const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
-    debugger;
     if (!name || !phone) {
-      Alert.alert("Error", "Name and Phone are required");
+      alert("Name and Phone are required");
+      return;
+    }
+
+    if (phone.length < 10) {
+      alert("Enter valid phone number");
       return;
     }
 
     try {
-      let userImageUrl = "";
-      let idCardUrl = "";
+      Keyboard.dismiss();
+      setLoading(true);
 
-      const supabaseUrl = "https://vihsrmhbzlejvueultdq.supabase.co";
-      const supabaseKey = "sb_publishable_HMy-TLDNjSGsWNrgFIRhHw_O_0wJjYb";
-      const supabase = createClient(supabaseUrl, supabaseKey);
-      const { data, error } = await supabase.rpc("ufn_create_member", {
-        in_member_code: `MBR_${Date.now()}`, // generate or pass your own
+      const userId = `${(Date.now() % 10000)
+        .toString()
+        .padStart(4, "0")}`;
+            const supabaseUrl = "https://vihsrmhbzlejvueultdq.supabase.co";
+            const supabaseKey = "sb_publishable_HMy-TLDNjSGsWNrgFIRhHw_O_0wJjYb";
+            const supabase = createClient(supabaseUrl, supabaseKey);
+
+      const { data, error } = await supabase.rpc("ufn_create_member_v1", {
+        in_applicationuserid: userId,
+
         in_first_name: name,
-        in_last_name: "", // split if needed
-        in_gender: gender || "",
+        in_last_name: lastName || "",
+
+        in_gender: gender,
         in_dob: dob || null,
+
         in_phone: phone,
         in_email: email || "",
+
         in_address: address || "",
-        in_city: "",       // fill if available
-        in_state: "",      // fill if available
-        in_pincode: "",    // fill if available
-        in_membership_type: "REGULAR", // or dynamic
-        in_height: null,   // pass number if available
-        in_weight: null,
-        in_emg_name: "",
-        in_emg_phone: "",
+        in_city: city || "",
+        in_state: stateName || "",
+        in_pincode: pincode || "",
+
+        in_membership_type: membershipType,
+
+        in_height: height ? Number(height) : null,
+        in_weight: weight ? Number(weight) : null,
+
+        in_emg_name: emgName || "",
+        in_emg_phone: emgPhone || "",
       });
 
       if (error) {
-        console.log("Supabase error:", error);
-        alert(error);
+        alert( error.message);
         return;
       }
-      debugger;
-      console.log("Success:", data);
-      alert(data);
-      router.back();
+
+      alert(data?.message);
+      //router.back();
     } catch (err) {
-      console.log("Unexpected error:", err);
-      Alert.alert("Error", "Something went wrong");
+      console.log(err);
+      alert("Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -97,13 +114,22 @@ const AddMemberScreen = () => {
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>New Member</Text>
 
+        {/* Name */}
         <TextInput
-          placeholder="Enter name"
+          placeholder="First Name"
           style={styles.input}
           value={name}
           onChangeText={setName}
         />
 
+        <TextInput
+          placeholder="Last Name"
+          style={styles.input}
+          value={lastName}
+          onChangeText={setLastName}
+        />
+
+        {/* Phone */}
         <View style={styles.row}>
           <View style={styles.codeBox}>
             <Text>+91</Text>
@@ -117,6 +143,7 @@ const AddMemberScreen = () => {
           />
         </View>
 
+        {/* Email */}
         <TextInput
           placeholder="Email"
           style={styles.input}
@@ -124,6 +151,50 @@ const AddMemberScreen = () => {
           onChangeText={setEmail}
         />
 
+        {/* DOB (Cross Platform) */}
+        {Platform.OS === "web" ? (
+          <input
+            type="date"
+            value={dob}
+            onChange={(e) => setDob(e.target.value)}
+            style={{
+              height: 50,
+              borderRadius: 10,
+              padding: 10,
+              marginTop: 12,
+              border: "none",
+              backgroundColor: "#E6EAF0",
+            }}
+          />
+        ) : (
+          <>
+            <TouchableOpacity
+              style={styles.input}
+              onPress={() => setShowDatePicker(true)}
+            >
+              <Text style={{ color: dob ? "#000" : "#9CA3AF" }}>
+                {dob || "Select Date of Birth"}
+              </Text>
+            </TouchableOpacity>
+
+            {showDatePicker && (
+              <DateTimePicker
+                value={dob ? new Date(dob) : new Date()}
+                mode="date"
+                display="default"
+                maximumDate={new Date()}
+                onChange={(event, selectedDate) => {
+                  setShowDatePicker(false);
+                  if (selectedDate) {
+                    setDob(selectedDate.toISOString().split("T")[0]);
+                  }
+                }}
+              />
+            )}
+          </>
+        )}
+
+        {/* Address */}
         <TextInput
           placeholder="Address"
           style={[styles.input, { height: 80 }]}
@@ -133,40 +204,77 @@ const AddMemberScreen = () => {
         />
 
         <TextInput
-          placeholder="Notes"
-          style={[styles.input, { height: 100 }]}
-          value={notes}
-          onChangeText={setNotes}
-          multiline
+          placeholder="City"
+          style={styles.input}
+          value={city}
+          onChangeText={setCity}
         />
 
-        {/* Images */}
-        <View style={styles.imageRow}>
-          <TouchableOpacity
-            style={styles.imageBox}
-            onPress={() => pickImage("user")}
-          >
-            {userImage ? (
-              <Image source={{ uri: userImage }} style={styles.image} />
-            ) : (
-              <Text>No User Image</Text>
-            )}
-          </TouchableOpacity>
+        <TextInput
+          placeholder="State"
+          style={styles.input}
+          value={stateName}
+          onChangeText={setStateName}
+        />
 
-          <TouchableOpacity
-            style={styles.imageBox}
-            onPress={() => pickImage("id")}
-          >
-            {idCardImage ? (
-              <Image source={{ uri: idCardImage }} style={styles.image} />
-            ) : (
-              <Text>No ID Card</Text>
-            )}
-          </TouchableOpacity>
-        </View>
+        <TextInput
+          placeholder="Pincode"
+          style={styles.input}
+          keyboardType="numeric"
+          value={pincode}
+          onChangeText={setPincode}
+        />
 
-        <TouchableOpacity style={styles.button} onPress={handleSave}>
-          <Text style={styles.buttonText}>Add new member</Text>
+        {/* Membership */}
+        <TextInput
+          placeholder="Membership Type"
+          style={styles.input}
+          value={membershipType}
+          onChangeText={setMembershipType}
+        />
+
+        {/* Health */}
+        <TextInput
+          placeholder="Height (cm)"
+          style={styles.input}
+          keyboardType="numeric"
+          value={height}
+          onChangeText={setHeight}
+        />
+
+        <TextInput
+          placeholder="Weight (kg)"
+          style={styles.input}
+          keyboardType="numeric"
+          value={weight}
+          onChangeText={setWeight}
+        />
+
+        {/* Emergency */}
+        <TextInput
+          placeholder="Emergency Contact Name"
+          style={styles.input}
+          value={emgName}
+          onChangeText={setEmgName}
+        />
+
+        <TextInput
+          placeholder="Emergency Contact Phone"
+          style={styles.input}
+          keyboardType="phone-pad"
+          value={emgPhone}
+          onChangeText={setEmgPhone}
+        />
+
+        {/* Button */}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSave}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? "Saving..." : "Add New Member"}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -178,15 +286,27 @@ export default AddMemberScreen;
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#F5F6F8" },
   container: { padding: 20 },
-  title: { fontSize: 18, fontWeight: "600", marginBottom: 20 },
+
+  title: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 20,
+  },
+
   input: {
     backgroundColor: "#E6EAF0",
     borderRadius: 10,
     paddingHorizontal: 15,
     height: 50,
+    justifyContent: "center",
     marginTop: 12,
   },
-  row: { flexDirection: "row", gap: 10 },
+
+  row: {
+    flexDirection: "row",
+    gap: 10,
+  },
+
   codeBox: {
     width: 70,
     height: 50,
@@ -196,24 +316,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 12,
   },
-  imageRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
-  },
-  imageBox: {
-    width: "48%",
-    height: 120,
-    backgroundColor: "#E6EAF0",
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 10,
-  },
+
   button: {
     backgroundColor: "#0A1E5E",
     height: 55,
@@ -222,5 +325,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 30,
   },
-  buttonText: { color: "#FFF", fontWeight: "600", fontSize: 16 },
+
+  buttonText: {
+    color: "#FFF",
+    fontWeight: "600",
+    fontSize: 16,
+  },
 });

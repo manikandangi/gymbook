@@ -30,13 +30,14 @@ export default function LoginScreen() {
     if (error) {
       alert(error);
     } else {
+      console.log(data)
       const dataed = data.split('~');
       if (dataed[0] == "0") {
         router.replace("/(tabs)");
       }
       else {
         alert(dataed[1]);
-        router.replace("/(tabs)");
+       // router.replace("/(tabs)");
       }
     }
   };
