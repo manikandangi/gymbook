@@ -65,38 +65,50 @@ export default function HomeScreen() {
             label="Active Members"
             value={dashboard["active_members"] || 0}
             colors={["#3B82F6", "#2563EB"]}
-            onPress={() => navigate("/(tabs)/member")}
+            onPress={() => navigate("/(tabs)/member?userId=2")}
           />
           <StatCard
             label="Expired in 30 days"
             value={dashboard["expiring_in_30_days"] || 0}
             colors={["#EF4444", "#DC2626"]}
-            onPress={() => navigate("/(tabs)/member")}
+            onPress={() => navigate("/(tabs)/member?userId=4")}
           />
         </View>
 
         <View style={styles.row}>
-          <WhiteCard
-            label="Expiring in 10 days"
-            value={dashboard["expiring_in_10_days"] || 0}
-            highlight
-             onPress={() => navigate("/(tabs)/member")}
-          />
-          <WhiteCard
-            label="Total Members"
-            value={dashboard["total_members"] || 0}
-             onPress={() => navigate("/(tabs)/member")}
-          />
-        </View>
+  <WhiteCard
+    label="Expiring in 10 days"
+    value={dashboard["expiring_in_10_days"] || 0}
+    highlight
+    onPress={() =>
+      router.push({
+        pathname: "/(tabs)/member",
+        params: { type: 5 }, // ✅ FIXED (was userId)
+      })
+    }
+  />
+
+  <WhiteCard
+    label="Total Members"
+    value={dashboard["total_members"] || 0}
+    onPress={() =>
+      router.push({
+        pathname: "/(tabs)/member",
+        params: { type: 1 }, // ✅ FIXED
+      })
+    }
+  />
+</View>
 
         <View style={styles.singleRow}>
-          <WhiteCard label="Today's Leads" value={dashboard["expired_members"] || 0} />
+          <WhiteCard label="expired Members" value={dashboard["expired_members"] || 0}           
+          onPress={() => navigate("/(tabs)/member?userId=3")}/>
         </View>
 
         {/* Quick Reports */}
-        <Text style={styles.section}>Quick Reports</Text>
+        {/* <Text style={styles.section}>Quick Reports</Text>
 
-        <View style={styles.reportCard}>
+        <View style={styles.reportCard}
           <View style={styles.reportHeader}>
             <Text style={styles.reportDate}>
               28 Jan 2026 - 28 Jan 2026
@@ -116,10 +128,10 @@ export default function HomeScreen() {
             <ReportItem label="Memberships" value="1" />
             <ReportItem label="Total Revenue" value="₹1,000" />
           </View>
-        </View>
+        </View> */}
 
         {/* Members with balance */}
-        <View style={styles.balanceCard}>
+        {/* <View style={styles.balanceCard}>
           <View style={styles.balanceHeader}>
             <Text style={styles.section}>Members with balance</Text>
             <View style={styles.badge}>
@@ -127,7 +139,7 @@ export default function HomeScreen() {
             </View>
           </View>
           <Text style={styles.muted}>No member with balance</Text>
-        </View>
+        </View> */}
       </ScrollView>
     </SafeAreaView>
   );
