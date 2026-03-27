@@ -76,33 +76,22 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.row}>
-  <WhiteCard
-    label="Expiring in 10 days"
-    value={dashboard["expiring_in_10_days"] || 0}
-    highlight
-    onPress={() =>
-      router.push({
-        pathname: "/(tabs)/member",
-        params: { type: 5 }, // ✅ FIXED (was userId)
-      })
-    }
-  />
-
-  <WhiteCard
-    label="Total Members"
-    value={dashboard["total_members"] || 0}
-    onPress={() =>
-      router.push({
-        pathname: "/(tabs)/member",
-        params: { type: 1 }, // ✅ FIXED
-      })
-    }
-  />
-</View>
+          <WhiteCard
+            label="Expiring in 10 days"
+            value={dashboard["expiring_in_10_days"] || 0}
+            highlight
+            onPress={() => navigate("/(tabs)/member?userId=5")}
+          />
+          <WhiteCard
+            label="Total Members"
+            value={dashboard["total_members"] || 0}
+            onPress={() => navigate("/(tabs)/member?userId=1")}
+          />
+        </View>
 
         <View style={styles.singleRow}>
-          <WhiteCard label="expired Members" value={dashboard["expired_members"] || 0}           
-          onPress={() => navigate("/(tabs)/member?userId=3")}/>
+          <WhiteCard label="Today's Leads" value={dashboard["expired_members"] || 0}
+            onPress={() => navigate("/(tabs)/member?userId=3")} />
         </View>
 
         {/* Quick Reports */}
@@ -159,7 +148,7 @@ const StatCard = ({ label, value, colors, onPress }: any) => (
   </TouchableOpacity>
 );
 
-const WhiteCard = ({ label, value, highlight }: any) => (
+const WhiteCard = ({ label, value, highlight, onPress }: any) => (
   <View style={styles.whiteCard}>
     <View>
       <Text style={styles.whiteLabel}>{label}</Text>
@@ -168,13 +157,15 @@ const WhiteCard = ({ label, value, highlight }: any) => (
           styles.whiteValue,
           highlight && { color: "#F59E0B" },
         ]}
+        onPress={onPress}
       >
         {value}
       </Text>
     </View>
 
-    <View style={styles.arrowBox}>
-      <Ionicons name="chevron-forward" size={16} color="#6B7280" />
+    <View style={styles.arrowBox} >
+      <Ionicons name="chevron-forward" size={16} color="#6B7280" 
+        onPress={onPress}/>
     </View>
   </View>
 );
