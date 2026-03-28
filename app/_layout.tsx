@@ -2,14 +2,14 @@
 
 import "react-native-reanimated"; // MUST BE FIRST
 
+import { AuthContext, useAuth } from "@/contexts/auth";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-
-import { AuthContext, useAuth } from "@/contexts/auth";
 
 SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
@@ -44,9 +44,11 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
+          <BottomSheetModalProvider>
           <AuthContext>
             <RootLayoutNav />
           </AuthContext>
+          </BottomSheetModalProvider>
         </QueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

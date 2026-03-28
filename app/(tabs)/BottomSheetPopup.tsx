@@ -1,7 +1,6 @@
 import {
   BottomSheetModal,
-  BottomSheetModalProvider,
-  BottomSheetView,
+  BottomSheetView
 } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
 import {
@@ -45,7 +44,7 @@ export default function BottomSheetWithFAB() {
   };
 
   return (
-    <BottomSheetModalProvider>
+    <>
       {/* ================= FAB ================= */}
       <View style={styles.fabWrapper}>
         <TouchableOpacity style={styles.fab} onPress={openSheet}>
@@ -77,7 +76,7 @@ export default function BottomSheetWithFAB() {
           </View>
         </Modal>
       )}
-    </BottomSheetModalProvider>
+      </>
   );
 }
 

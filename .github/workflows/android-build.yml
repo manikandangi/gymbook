@@ -44,6 +44,7 @@ jobs:
       # ✅ Use npx instead of global install
       - name: Build APK
         run: |
+          npx expo prebuild
           cd android
           chmod +x gradlew
           ./gradlew assembleRelease --no-daemon --parallel --build-cache
