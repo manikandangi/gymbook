@@ -64,9 +64,9 @@ const AddMemberScreen = () => {
       const userId = `${(Date.now() % 10000)
         .toString()
         .padStart(4, "0")}`;
-            const supabaseUrl = "https://vihsrmhbzlejvueultdq.supabase.co";
-            const supabaseKey = "sb_publishable_HMy-TLDNjSGsWNrgFIRhHw_O_0wJjYb";
-            const supabase = createClient(supabaseUrl, supabaseKey);
+      const supabaseUrl = "https://vihsrmhbzlejvueultdq.supabase.co";
+      const supabaseKey = "sb_publishable_HMy-TLDNjSGsWNrgFIRhHw_O_0wJjYb";
+      const supabase = createClient(supabaseUrl, supabaseKey);
 
       const { data, error } = await supabase.rpc("ufn_create_member_v1", {
         in_applicationuserid: userId,
@@ -95,7 +95,7 @@ const AddMemberScreen = () => {
       });
 
       if (error) {
-        alert( error.message);
+        alert(error.message);
         return;
       }
 
@@ -112,8 +112,13 @@ const AddMemberScreen = () => {
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>New Member</Text>
-
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Text style={styles.close}>✕</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>New Member</Text>
+          <View style={{ width: 24 }} />
+        </View>
         {/* Name */}
         <TextInput
           placeholder="First Name"
@@ -324,6 +329,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 30,
+  },
+
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginVertical: 12,
+  },
+
+  close: {
+    fontSize: 20,
+    color: "#000",
+  },
+
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#000",
   },
 
   buttonText: {

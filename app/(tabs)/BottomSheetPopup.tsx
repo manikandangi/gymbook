@@ -1,4 +1,4 @@
-import BottomSheet from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
 import {
   FileText,
@@ -22,13 +22,15 @@ export default function BottomSheetWithFAB() {
   const snapPoints = useMemo(() => ["65%"], []);
   const [webVisible, setWebVisible] = useState(false);
 
- const openSheet = useCallback(() => {
-  if (Platform.OS === "web") {
-    setWebVisible(true);
-  } else {
-    sheetRef.current?.expand();
-  }
-}, []);
+  const openSheet = useCallback(() => {
+    if (Platform.OS === "web") {
+      setWebVisible(true);
+    } else {
+      alert("hai");
+      sheetRef.current?.expand();
+      sheetRef.current?.snapToIndex(0);
+    }
+  }, []);
   const closeSheet = () => {
     if (Platform.OS === "web") {
       setWebVisible(false);
@@ -58,7 +60,9 @@ export default function BottomSheetWithFAB() {
           backgroundStyle={styles.sheetBg}
           handleIndicatorStyle={styles.handle}
         >
-          <SheetContent closeSheet={closeSheet} />
+          <BottomSheetView>
+            <SheetContent closeSheet={closeSheet} />
+          </BottomSheetView>
         </BottomSheet>
       )}
 
@@ -94,7 +98,7 @@ const SheetContent = ({ closeSheet }: { closeSheet: () => void }) => {
       {/* Grid */}
       <View style={styles.gridCard}>
         <View style={styles.grid}>
-          <MenuItem icon={<Users size={22} />} label="Member" onPress={() => navigate("/(tabs)/addMember")}/>
+          <MenuItem icon={<Users size={22} />} label="Member" onPress={() => navigate("/(tabs)/addMember")} />
 
           <MenuItem
             icon={<UserPlus size={22} />}
@@ -102,21 +106,21 @@ const SheetContent = ({ closeSheet }: { closeSheet: () => void }) => {
             onPress={() => navigate("/(tabs)/AddStaffScreen")}
           />
 
-          <MenuItem icon={<FileText size={22} />} label="Plan" 
-          onPress={() => navigate("/(tabs)/NewPlan")}
+          <MenuItem icon={<FileText size={22} />} label="Plan"
+            onPress={() => navigate("/(tabs)/NewPlan")}
           />
-          <MenuItem icon={<Receipt size={22} />} label="Leads" onPress={() => navigate("/(tabs)/Leeds")}/>
-          <MenuItem icon={<Receipt size={22} />} label="Expense"  onPress={() => navigate("/(tabs)/CreateExpenseScreen")}/>
+          <MenuItem icon={<Receipt size={22} />} label="Leads" onPress={() => navigate("/(tabs)/Leeds")} />
+          <MenuItem icon={<Receipt size={22} />} label="Expense" onPress={() => navigate("/(tabs)/CreateExpenseScreen")} />
         </View>
       </View>
 
       <Text style={styles.section}>Other Actions</Text>
 
       <View style={styles.actionCard}>
-        <ActionItem label="Manage Staff" onPress={() => navigate("/(tabs)/ManageStaff")}/>
-        <ActionItem label="Manage Plans" onPress={() => navigate("/(tabs)/ManagePlans")}/>
-        <ActionItem label="View All Leads" onPress={() => navigate("/(tabs)/PotentialLeads")}/>
-        <ActionItem label="Manage Expenses" onPress={() => navigate("/(tabs)/ExpensesScreen")}/>
+        <ActionItem label="Manage Staff" onPress={() => navigate("/(tabs)/ManageStaff")} />
+        <ActionItem label="Manage Plans" onPress={() => navigate("/(tabs)/ManagePlans")} />
+        <ActionItem label="View All Leads" onPress={() => navigate("/(tabs)/PotentialLeads")} />
+        <ActionItem label="Manage Expenses" onPress={() => navigate("/(tabs)/ExpensesScreen")} />
       </View>
     </View>
   );
@@ -248,7 +252,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingHorizontal: 16,
   },
+  greyLine: {
 
+  },
   actionItem: {
     flexDirection: "row",
     justifyContent: "space-between",

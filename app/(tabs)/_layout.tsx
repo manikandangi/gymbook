@@ -6,7 +6,7 @@ export default function TabLayout() {
   const pathname = usePathname();
 
   // routes where footer should be hidden
-  const hideFooterRoutes = ["/AddStaffScreen",'/NewPlan','/CreateExpenseScreen'];
+  const hideFooterRoutes = ["/AddStaffScreen",'/NewPlan','/CreateExpenseScreen','/addMember'];
 
   const shouldHideFooter = hideFooterRoutes.includes(pathname);
 
