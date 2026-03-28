@@ -2,7 +2,7 @@ name: Android Build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
@@ -12,20 +12,44 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      # ✅ Setup Node with cache
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
 
+      # ✅ Install dependencies (faster)
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Setup Expo
-        run: npm install -g expo-cli
+      # ✅ Cache Expo & npm
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
 
+      # ✅ Cache Gradle (VERY IMPORTANT)
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # ✅ Use npx instead of global install
       - name: Build APK
-        run: npx expo prebuild && cd android && ./gradlew assembleRelease
+        run: |
+          npx expo prebuild
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon --parallel --build-cache
 
+      # ✅ Upload APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:

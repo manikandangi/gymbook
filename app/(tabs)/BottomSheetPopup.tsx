@@ -1,4 +1,8 @@
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
 import {
   FileText,
@@ -18,29 +22,30 @@ import {
 } from "react-native";
 
 export default function BottomSheetWithFAB() {
-  const sheetRef = useRef<BottomSheet>(null);
+  const sheetRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["65%"], []);
   const [webVisible, setWebVisible] = useState(false);
 
-  // ✅ FIXED
+  // ✅ OPEN SHEET
   const openSheet = useCallback(() => {
     if (Platform.OS === "web") {
       setWebVisible(true);
     } else {
-      sheetRef.current?.snapToIndex(0); // ✅ ONLY THIS
+      sheetRef.current?.present(); // ✅ KEY FIX
     }
   }, []);
 
+  // ✅ CLOSE SHEET
   const closeSheet = () => {
     if (Platform.OS === "web") {
       setWebVisible(false);
     } else {
-      sheetRef.current?.close();
+      sheetRef.current?.dismiss();
     }
   };
 
   return (
-    <>
+    <BottomSheetModalProvider>
       {/* ================= FAB ================= */}
       <View style={styles.fabWrapper}>
         <TouchableOpacity style={styles.fab} onPress={openSheet}>
@@ -50,20 +55,17 @@ export default function BottomSheetWithFAB() {
 
       {/* ================= MOBILE SHEET ================= */}
       {Platform.OS !== "web" && (
-        <BottomSheet
+        <BottomSheetModal
           ref={sheetRef}
-          index={-1}
           snapPoints={snapPoints}
           enablePanDownToClose
-          animateOnMount // ✅ IMPORTANT
-          enableDynamicSizing={false} // ✅ IMPORTANT
           backgroundStyle={styles.sheetBg}
           handleIndicatorStyle={styles.handle}
         >
-          <BottomSheetView style={{ flex: 1, minHeight: 300 }}>
+          <BottomSheetView style={{ flex: 1 }}>
             <SheetContent closeSheet={closeSheet} />
           </BottomSheetView>
-        </BottomSheet>
+        </BottomSheetModal>
       )}
 
       {/* ================= WEB FALLBACK ================= */}
@@ -75,7 +77,7 @@ export default function BottomSheetWithFAB() {
           </View>
         </Modal>
       )}
-    </>
+    </BottomSheetModalProvider>
   );
 }
 
@@ -193,11 +195,10 @@ const ActionItem = ({
 const styles = StyleSheet.create({
   fabWrapper: {
     position: "absolute",
-    bottom: 18,
+    bottom: 20,
     alignSelf: "center",
-    alignItems: "center",
     zIndex: 999,
-    elevation: 20, // ✅ FIX
+    elevation: 20,
   },
 
   fab: {
@@ -214,7 +215,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
-    elevation: 50,
   },
 
   handle: {
