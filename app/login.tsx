@@ -52,7 +52,7 @@ export default function LoginScreen() {
 
         <TextInput
           style={styles.input}
-          placeholder="Email"
+          placeholder="Mobile NO"
           value={email}
           onChangeText={setEmail}
         />
