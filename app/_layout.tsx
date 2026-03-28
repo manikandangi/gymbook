@@ -1,6 +1,4 @@
-// app/_layout.tsx
-
-import "react-native-reanimated"; // MUST BE FIRST
+import "react-native-reanimated";
 
 import { AuthContext, useAuth } from "@/contexts/auth";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
@@ -45,9 +43,9 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
           <BottomSheetModalProvider>
-          <AuthContext>
-            <RootLayoutNav />
-          </AuthContext>
+            <AuthContext>
+              <RootLayoutNav />
+            </AuthContext>
           </BottomSheetModalProvider>
         </QueryClientProvider>
       </SafeAreaProvider>
