@@ -12,7 +12,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthContext, useAuth } from "@/contexts/auth";
 
 SplashScreen.preventAutoHideAsync();
-
 const queryClient = new QueryClient();
 
 function RootLayoutNav() {
