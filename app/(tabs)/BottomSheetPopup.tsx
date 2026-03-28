@@ -22,15 +22,15 @@ export default function BottomSheetWithFAB() {
   const snapPoints = useMemo(() => ["65%"], []);
   const [webVisible, setWebVisible] = useState(false);
 
+  // ✅ FIXED
   const openSheet = useCallback(() => {
     if (Platform.OS === "web") {
       setWebVisible(true);
     } else {
-      alert("hai");
-      sheetRef.current?.expand();
-      sheetRef.current?.snapToIndex(0);
+      sheetRef.current?.snapToIndex(0); // ✅ ONLY THIS
     }
   }, []);
+
   const closeSheet = () => {
     if (Platform.OS === "web") {
       setWebVisible(false);
@@ -43,8 +43,6 @@ export default function BottomSheetWithFAB() {
     <>
       {/* ================= FAB ================= */}
       <View style={styles.fabWrapper}>
-        <View style={styles.greyLine} />
-
         <TouchableOpacity style={styles.fab} onPress={openSheet}>
           <Plus size={28} color="#fff" />
         </TouchableOpacity>
@@ -57,10 +55,12 @@ export default function BottomSheetWithFAB() {
           index={-1}
           snapPoints={snapPoints}
           enablePanDownToClose
+          animateOnMount // ✅ IMPORTANT
+          enableDynamicSizing={false} // ✅ IMPORTANT
           backgroundStyle={styles.sheetBg}
           handleIndicatorStyle={styles.handle}
         >
-          <BottomSheetView>
+          <BottomSheetView style={{ flex: 1, minHeight: 300 }}>
             <SheetContent closeSheet={closeSheet} />
           </BottomSheetView>
         </BottomSheet>
@@ -98,7 +98,11 @@ const SheetContent = ({ closeSheet }: { closeSheet: () => void }) => {
       {/* Grid */}
       <View style={styles.gridCard}>
         <View style={styles.grid}>
-          <MenuItem icon={<Users size={22} />} label="Member" onPress={() => navigate("/(tabs)/addMember")} />
+          <MenuItem
+            icon={<Users size={22} />}
+            label="Member"
+            onPress={() => navigate("/(tabs)/addMember")}
+          />
 
           <MenuItem
             icon={<UserPlus size={22} />}
@@ -106,21 +110,45 @@ const SheetContent = ({ closeSheet }: { closeSheet: () => void }) => {
             onPress={() => navigate("/(tabs)/AddStaffScreen")}
           />
 
-          <MenuItem icon={<FileText size={22} />} label="Plan"
+          <MenuItem
+            icon={<FileText size={22} />}
+            label="Plan"
             onPress={() => navigate("/(tabs)/NewPlan")}
           />
-          <MenuItem icon={<Receipt size={22} />} label="Leads" onPress={() => navigate("/(tabs)/Leeds")} />
-          <MenuItem icon={<Receipt size={22} />} label="Expense" onPress={() => navigate("/(tabs)/CreateExpenseScreen")} />
+
+          <MenuItem
+            icon={<Receipt size={22} />}
+            label="Leads"
+            onPress={() => navigate("/(tabs)/Leeds")}
+          />
+
+          <MenuItem
+            icon={<Receipt size={22} />}
+            label="Expense"
+            onPress={() => navigate("/(tabs)/CreateExpenseScreen")}
+          />
         </View>
       </View>
 
       <Text style={styles.section}>Other Actions</Text>
 
       <View style={styles.actionCard}>
-        <ActionItem label="Manage Staff" onPress={() => navigate("/(tabs)/ManageStaff")} />
-        <ActionItem label="Manage Plans" onPress={() => navigate("/(tabs)/ManagePlans")} />
-        <ActionItem label="View All Leads" onPress={() => navigate("/(tabs)/PotentialLeads")} />
-        <ActionItem label="Manage Expenses" onPress={() => navigate("/(tabs)/ExpensesScreen")} />
+        <ActionItem
+          label="Manage Staff"
+          onPress={() => navigate("/(tabs)/ManageStaff")}
+        />
+        <ActionItem
+          label="Manage Plans"
+          onPress={() => navigate("/(tabs)/ManagePlans")}
+        />
+        <ActionItem
+          label="View All Leads"
+          onPress={() => navigate("/(tabs)/PotentialLeads")}
+        />
+        <ActionItem
+          label="Manage Expenses"
+          onPress={() => navigate("/(tabs)/ExpensesScreen")}
+        />
       </View>
     </View>
   );
@@ -144,14 +172,13 @@ const MenuItem = ({
     <Text style={styles.menuText}>{label}</Text>
   </TouchableOpacity>
 );
-interface ActionItemProps {
-  label: string;
-  onPress?: () => void;
-}
 
-const ActionItem: React.FC<ActionItemProps> = ({
+const ActionItem = ({
   label,
   onPress,
+}: {
+  label: string;
+  onPress?: () => void;
 }) => (
   <TouchableOpacity style={styles.actionItem} onPress={onPress}>
     <Text style={styles.actionText}>{label}</Text>
@@ -170,26 +197,24 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     alignItems: "center",
     zIndex: 999,
+    elevation: 20, // ✅ FIX
   },
 
   fab: {
-    position: 'absolute',
-    bottom: 20,
-    alignSelf: 'center',
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#0A1E5C',
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 8,
+    backgroundColor: "#0A1E5C",
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 10,
   },
-  fabPlus: { color: '#FFF', fontSize: 34 },
 
   sheetBg: {
     backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
+    elevation: 50,
   },
 
   handle: {
@@ -252,9 +277,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingHorizontal: 16,
   },
-  greyLine: {
 
-  },
   actionItem: {
     flexDirection: "row",
     justifyContent: "space-between",
