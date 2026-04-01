@@ -8,7 +8,7 @@ const BottomNav: React.FC = () => {
   return (
     <View style={styles.bottomNav}>
       <NavItem icon="home-outline" label="Dashboard" active href="/(tabs)"/>
-      <NavItem icon="people-outline" label="Members" href="/(tabs)/member" />
+      <NavItem icon="people-outline" label="Members" href="/(tabs)/member?userId=0" />
       <BottomSheetWithFAB />
       <NavItem icon="card-outline" label="Transactions" href="/(tabs)/transactions"/>
       <NavItem icon="stats-chart-outline" label="Reports" href="/(tabs)/reports"/>

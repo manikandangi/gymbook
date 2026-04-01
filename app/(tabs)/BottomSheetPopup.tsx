@@ -39,7 +39,7 @@ export default function BottomSheetWithFAB() {
       setWebVisible(false);
     } else {
       sheetRef.current?.dismiss();
-    }
+    }   
   };
 
   const navigate = (path: string) => {
@@ -50,7 +50,7 @@ export default function BottomSheetWithFAB() {
   return (
     <>
       {/* FAB */}
-      <View style={styles.fabWrapper}>
+      <View style={styles.fabWrapper}> 
         <TouchableOpacity style={styles.fab} onPress={openSheet}>
           <Plus size={28} color="#fff" />
         </TouchableOpacity>
@@ -98,7 +98,11 @@ export default function BottomSheetWithFAB() {
           <View style={styles.overlay} />
           <View style={styles.webSheet}>
             <View style={styles.container}>
-              <Text style={styles.title}>+ Add New</Text>
+                 <MenuItem icon={<Users size={22} />} label="Member" onPress={() => navigate("/(tabs)/addMember")} />
+                  <MenuItem icon={<UserPlus size={22} />} label="Staff" onPress={() => navigate("/(tabs)/AddStaffScreen")} />
+                  <MenuItem icon={<FileText size={22} />} label="Plan" onPress={() => navigate("/(tabs)/NewPlan")} />
+                  <MenuItem icon={<Receipt size={22} />} label="Leads" onPress={() => navigate("/(tabs)/Leeds")} />
+                  <MenuItem icon={<Receipt size={22} />} label="Expense" onPress={() => navigate("/(tabs)/CreateExpenseScreen")} />
             </View>
           </View>
         </Modal>

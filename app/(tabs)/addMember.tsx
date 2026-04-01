@@ -1,7 +1,7 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Keyboard,
   Platform,
@@ -13,47 +13,97 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import RNPickerSelect from "react-native-picker-select";
+const supabase = createClient(
+  "https://vihsrmhbzlejvueultdq.supabase.co",
+  "sb_publishable_HMy-TLDNjSGsWNrgFIRhHw_O_0wJjYb"
+);
 
-const AddMemberScreen = () => {
+export default function AddMemberScreen() {
   const router = useRouter();
-
-  // Basic
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-
-  // DOB
   const [dob, setDob] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
-
-  const [gender, setGender] = useState<"Male" | "Female">("Male");
-
-  // Address
+  const [gender, setGender] = useState("Male");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [stateName, setStateName] = useState("");
   const [pincode, setPincode] = useState("");
-
-  // Extra
-  const [membershipType, setMembershipType] = useState("REGULAR");
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
-
-  // Emergency
   const [emgName, setEmgName] = useState("");
   const [emgPhone, setEmgPhone] = useState("");
 
+  const [membershipType, setMembershipType] = useState(null);
+  const [membershipData, setMembershipData] = useState([]);
+  const [options, setOptions] = useState([]);
+  const [customDays, setCustomDays] = useState("");
+
   const [loading, setLoading] = useState(false);
 
+  /* ================= FETCH ================= */
+  useEffect(() => {
+    fetchMembershipTypes();
+  }, []);
+
+  const fetchMembershipTypes = async () => {
+    try {
+      const { data, error } = await supabase.rpc("ufn_get_membership_types");
+      if (error) throw error;
+
+      setMembershipData(data);
+
+      const formatted = data.map(item => ({
+        label: `${item.membership_name} (${item.duration_days} days)`,
+        value: item.membership_type_id
+      }));
+
+      setOptions(formatted);
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  /* ================= SELECTED PLAN ================= */
+  const selectedPlan = membershipData.find(
+    item => item.membership_type_id === membershipType
+  );
+
+  /* ================= CLEAR CUSTOM DAYS ================= */
+  useEffect(() => {
+    setCustomDays("");
+  }, [membershipType]);
+
+  /* ================= SAVE ================= */
   const handleSave = async () => {
-    if (!name || !phone) {
-      alert("Name and Phone are required");
+    if (
+      !name ||
+      !phone ||
+      !email ||
+      !address ||
+      !city ||
+      !stateName ||
+      !pincode ||
+      !membershipType||
+      !lastName||
+      !height||
+      !weight||
+      !emgName
+    ) {
+      alert("All fields are mandatory");
       return;
     }
 
-    if (phone.length < 10) {
+    if (phone.length < 10 || emgPhone.length < 10) {
       alert("Enter valid phone number");
+      return;
+    }
+
+    if (selectedPlan?.duration_days === 1 && !customDays) {
+      alert("Enter number of days");
       return;
     }
 
@@ -61,57 +111,50 @@ const AddMemberScreen = () => {
       Keyboard.dismiss();
       setLoading(true);
 
-      const userId = `${(Date.now() % 10000)
-        .toString()
-        .padStart(4, "0")}`;
-      const supabaseUrl = "https://vihsrmhbzlejvueultdq.supabase.co";
-      const supabaseKey = "sb_publishable_HMy-TLDNjSGsWNrgFIRhHw_O_0wJjYb";
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      const userId =
+        Platform.OS === "web" ? localStorage.getItem("userid") : null;
 
       const { data, error } = await supabase.rpc("ufn_create_member_v1", {
         in_applicationuserid: userId,
-
         in_first_name: name,
         in_last_name: lastName || "",
-
         in_gender: gender,
         in_dob: dob || null,
-
         in_phone: phone,
-        in_email: email || "",
-
-        in_address: address || "",
-        in_city: city || "",
-        in_state: stateName || "",
-        in_pincode: pincode || "",
-
+        in_email: email,
+        in_address: address,
+        in_city: city,
+        in_state: stateName,
+        in_pincode: pincode,
         in_membership_type: membershipType,
-
+        in_membership_type:
+          selectedPlan?.duration_days === 1
+            ? Number(customDays)
+            : selectedPlan?.duration_days,
         in_height: height ? Number(height) : null,
         in_weight: weight ? Number(weight) : null,
-
         in_emg_name: emgName || "",
-        in_emg_phone: emgPhone || "",
+        in_emg_phone: emgPhone || ""
       });
 
-      if (error) {
-        alert(error.message);
-        return;
-      }
+      if (error) throw error;
 
-      alert(data?.message);
+      alert("Member Added Successfully");
       router.back();
+
     } catch (err) {
-      console.log(err);
-      alert("Something went wrong");
+      alert(err.message);
     } finally {
       setLoading(false);
     }
   };
 
+  /* ================= UI ================= */
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container}>
+
+        {/* HEADER */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()}>
             <Text style={styles.close}>✕</Text>
@@ -119,198 +162,130 @@ const AddMemberScreen = () => {
           <Text style={styles.headerTitle}>New Member</Text>
           <View style={{ width: 24 }} />
         </View>
-        {/* Name */}
-        <TextInput
-          placeholder="First Name"
-          style={styles.input}
-          value={name}
-          onChangeText={setName}
-        />
 
-        <TextInput
-          placeholder="Last Name"
-          style={styles.input}
-          value={lastName}
-          onChangeText={setLastName}
-        />
+        {/* INPUTS */}
+        <TextInput placeholder="First Name" style={styles.input} value={name} onChangeText={setName} maxLength={50}/>
+        <TextInput placeholder="Last Name" style={styles.input} value={lastName} onChangeText={setLastName} maxLength={50}/>
 
-        {/* Phone */}
         <View style={styles.row}>
-          <View style={styles.codeBox}>
-            <Text>+91</Text>
-          </View>
+          <View style={styles.codeBox}><Text>+91</Text></View>
           <TextInput
             placeholder="Phone"
             style={[styles.input, { flex: 1 }]}
             keyboardType="phone-pad"
             value={phone}
             onChangeText={setPhone}
+            maxLength={10}
           />
         </View>
 
-        {/* Email */}
-        <TextInput
-          placeholder="Email"
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-        />
+        <TextInput placeholder="Email" style={styles.input} value={email} onChangeText={setEmail} maxLength={50} />
 
-        {/* DOB (Cross Platform) */}
+        {/* DOB */}
         {Platform.OS === "web" ? (
           <input
             type="date"
             value={dob}
             onChange={(e) => setDob(e.target.value)}
-            style={{
-              height: 50,
-              borderRadius: 10,
-              padding: 10,
-              marginTop: 12,
-              border: "none",
-              backgroundColor: "#E6EAF0",
-            }}
+            style={styles.webDate}
           />
         ) : (
           <>
-            <TouchableOpacity
-              style={styles.input}
-              onPress={() => setShowDatePicker(true)}
-            >
-              <Text style={{ color: dob ? "#000" : "#9CA3AF" }}>
-                {dob || "Select Date of Birth"}
-              </Text>
+            <TouchableOpacity style={styles.input} onPress={() => setShowDatePicker(true)}>
+              <Text>{dob || "Select Date of Birth"}</Text>
             </TouchableOpacity>
 
             {showDatePicker && (
               <DateTimePicker
                 value={dob ? new Date(dob) : new Date()}
                 mode="date"
-                display="default"
                 maximumDate={new Date()}
-                onChange={(event, selectedDate) => {
+                onChange={(e, d) => {
                   setShowDatePicker(false);
-                  if (selectedDate) {
-                    setDob(selectedDate.toISOString().split("T")[0]);
-                  }
+                  if (d) setDob(d.toISOString().split("T")[0]);
                 }}
               />
             )}
           </>
         )}
 
-        {/* Address */}
-        <TextInput
-          placeholder="Address"
-          style={[styles.input, { height: 80 }]}
-          value={address}
-          onChangeText={setAddress}
-          multiline
-        />
+        {/* ADDRESS */}
+        <TextInput placeholder="Address" style={[styles.input, { height: 80 }]} value={address} onChangeText={setAddress} multiline />
+        <TextInput placeholder="City" style={styles.input} value={city} onChangeText={setCity} maxLength={30}/>
+        <TextInput placeholder="State" style={styles.input} value={stateName} onChangeText={setStateName} maxLength={50}/>
+        <TextInput placeholder="Pincode" style={styles.input} value={pincode} onChangeText={setPincode} maxLength={6}/>
 
-        <TextInput
-          placeholder="City"
-          style={styles.input}
-          value={city}
-          onChangeText={setCity}
-        />
+        {/* DROPDOWN */}
+        <View style={styles.dropdownWrapper}>
+          <RNPickerSelect
+            onValueChange={setMembershipType}
+            items={options}
+            value={membershipType}
+            placeholder={{ label: "Select Membership Type", value: null }}
+            style={pickerStyles}
+        
+          />
+        </View>
 
-        <TextInput
-          placeholder="State"
-          style={styles.input}
-          value={stateName}
-          onChangeText={setStateName}
-        />
+        {/* DAY INPUT */}
+        {selectedPlan?.duration_days === 1 && (
+          <TextInput
+            placeholder="Enter number of days"
+            style={styles.input}
+            keyboardType="numeric"
+            value={customDays}
+            onChangeText={setCustomDays}
+            maxLength={50}
+          />
+        )}
 
-        <TextInput
-          placeholder="Pincode"
-          style={styles.input}
-          keyboardType="numeric"
-          value={pincode}
-          onChangeText={setPincode}
-        />
+        {/* HEALTH */}
+        <TextInput placeholder="Height (cm)" style={styles.input} value={height} onChangeText={setHeight} maxLength={5}/>
+        <TextInput placeholder="Weight (kg)" style={styles.input} value={weight} onChangeText={setWeight} maxLength={5} />
 
-        {/* Membership */}
-        <TextInput
-          placeholder="Membership Type"
-          style={styles.input}
-          value={membershipType}
-          onChangeText={setMembershipType}
-        />
+        {/* EMERGENCY */}
+        <TextInput placeholder="Emergency Name" style={styles.input} value={emgName} onChangeText={setEmgName}  maxLength={50}/>
+        <TextInput placeholder="Emergency Phone" style={styles.input} value={emgPhone} onChangeText={setEmgPhone} maxLength={10}/>
 
-        {/* Health */}
-        <TextInput
-          placeholder="Height (cm)"
-          style={styles.input}
-          keyboardType="numeric"
-          value={height}
-          onChangeText={setHeight}
-        />
-
-        <TextInput
-          placeholder="Weight (kg)"
-          style={styles.input}
-          keyboardType="numeric"
-          value={weight}
-          onChangeText={setWeight}
-        />
-
-        {/* Emergency */}
-        <TextInput
-          placeholder="Emergency Contact Name"
-          style={styles.input}
-          value={emgName}
-          onChangeText={setEmgName}
-        />
-
-        <TextInput
-          placeholder="Emergency Contact Phone"
-          style={styles.input}
-          keyboardType="phone-pad"
-          value={emgPhone}
-          onChangeText={setEmgPhone}
-        />
-
-        {/* Button */}
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleSave}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>
-            {loading ? "Saving..." : "Add New Member"}
-          </Text>
+        {/* BUTTON */}
+        <TouchableOpacity style={styles.button} onPress={handleSave} disabled={loading}>
+          <Text style={styles.buttonText}>{loading ? "Saving..." : "Add Member"}</Text>
         </TouchableOpacity>
+
       </ScrollView>
     </SafeAreaView>
   );
-};
+}
 
-export default AddMemberScreen;
+/* ================= STYLES ================= */
+
+const pickerStyles = {
+  inputIOS: { padding: 14 },
+  inputAndroid: { padding: 12 },
+  inputWeb: { padding: 12, borderWidth: 0, outlineWidth: 0 }
+};
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#F5F6F8" },
   container: { padding: 20 },
 
-  title: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 20,
-  },
-
   input: {
     backgroundColor: "#E6EAF0",
     borderRadius: 10,
-    paddingHorizontal: 15,
-    height: 50,
-    justifyContent: "center",
-    marginTop: 12,
+    padding: 12,
+    marginTop: 12
   },
 
-  row: {
-    flexDirection: "row",
-    gap: 10,
+  webDate: {
+    height: 50,
+    borderRadius: 10,
+    padding: 10,
+    marginTop: 12,
+    border: "none",
+    backgroundColor: "#E6EAF0"
   },
+
+  row: { flexDirection: "row", gap: 10 },
 
   codeBox: {
     width: 70,
@@ -319,39 +294,31 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 12,
+    marginTop: 12
+  },
+
+  dropdownWrapper: {
+    backgroundColor: "#E6EAF0",
+    borderRadius: 10,
+    marginTop: 12
   },
 
   button: {
     backgroundColor: "#0A1E5E",
-    height: 55,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 30,
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 20,
+    alignItems: "center"
   },
+
+  buttonText: { color: "#fff", fontWeight: "600" },
 
   header: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    marginVertical: 12,
+    alignItems: "center"
   },
 
-  close: {
-    fontSize: 20,
-    color: "#000",
-  },
-
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#000",
-  },
-
-  buttonText: {
-    color: "#FFF",
-    fontWeight: "600",
-    fontSize: 16,
-  },
+  close: { fontSize: 20 },
+  headerTitle: { fontSize: 18, fontWeight: "600" }
 });

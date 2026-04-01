@@ -34,10 +34,11 @@ export default function LoginScreen() {
       const dataed = data.split('~');
       if (dataed[0] == "0") {
         router.replace("/(tabs)");
+        localStorage.setItem("userid", dataed[dataed.length - 1]);
       }
       else {
         alert(dataed[1]);
-       // router.replace("/(tabs)");
+        // router.replace("/(tabs)");
       }
     }
   };
