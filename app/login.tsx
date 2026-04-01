@@ -45,7 +45,7 @@ export default function LoginScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.logo}>DGYMBOOK</Text>
+        <Text style={styles.logo}>UFGymBook</Text>
       </View>
 
       <View style={styles.card}>
