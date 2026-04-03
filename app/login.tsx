@@ -13,7 +13,6 @@ import {
 } from "react-native";
 
 export default function LoginScreen() {
-  debugger;
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,8 +32,8 @@ export default function LoginScreen() {
     } else {
       console.log(data)
       const dataed = data.split('~');
-      if (dataed[0] == "0") {
-        await AsyncStorage.setItem("userid", dataed[dataed.length - 1]);        
+      if (dataed[0] === "0") {
+        await AsyncStorage.setItem("userid", dataed[dataed.length - 1]);
         router.replace("/(tabs)");
       }
       else {

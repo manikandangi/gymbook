@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 
+const DEFAULT_FONT_FAMILY = Platform.select({ ios: 'System', android: 'sans-serif', web: 'system-ui' });
+
 /* ── Supabase ── */
 const supabase = createClient(
   "https://vihsrmhbzlejvueultdq.supabase.co",
@@ -39,7 +41,11 @@ const INITIAL_FORM = {
 
 /* ── Reusable field component ── */
 const Field = ({ style, ...props }: React.ComponentProps<typeof TextInput>) => (
-  <TextInput style={[styles.input, style]} {...props} />
+  <TextInput
+    style={[styles.input, style]}
+    placeholderTextColor="#6c7587"
+    {...props}
+  />
 );
 
 /* ══════════════════════════════════════════ */
@@ -58,6 +64,30 @@ export default function AddMemberScreen() {
   const [membershipData, setMembershipData] = useState<any[]>([]);
   const [customDays, setCustomDays]         = useState("");
   const [loading, setLoading]               = useState(false);
+
+  const [appUserId, setAppUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const storedId = Platform.OS === "web"
+          ? localStorage.getItem("userid")
+          : await AsyncStorage.getItem("userid");
+
+        if (!storedId) {
+          alert("User is not logged in. Please sign in again.");
+          router.replace("/login");
+          return;
+        }
+
+        setAppUserId(storedId);
+      } catch (error) {
+        console.warn("Failed to read user id from storage", error);
+        alert("Unable to read user credentials. Please re-login.");
+        router.replace("/login");
+      }
+    })();
+  }, [router]);
 
   /* ── State / City dropdown data ── */
   const [stateOptions, setStateOptions] = useState<{ label: string; value: string }[]>([]);
@@ -144,16 +174,22 @@ export default function AddMemberScreen() {
     setLoading(true);
 
     try {
-      const userId = Platform.OS === "web"
-        ? localStorage.getItem("userid")
-        : await AsyncStorage.getItem("userid");
+      if (!appUserId) {
+        alert("Unable to save member: no user session found. Please login again.");
+        router.replace("/login");
+        return;
+      }
+
+      const userIdNumber = Number(appUserId);
+      if (Number.isNaN(userIdNumber)) {
+        throw new Error("Invalid user id in storage");
+      }
 
       let durationDays = isCustomDuration
         ? Number(customDays)
         : selectedPlan?.duration_days;
-        debugger;
       const { error } = await supabase.rpc("ufn_create_member_v1", {
-        in_applicationuserid: userId,
+        in_applicationuserid: userIdNumber,
         in_first_name:        form.name,
         in_last_name:         form.lastName,
         in_gender:            form.gender,
@@ -184,7 +220,7 @@ export default function AddMemberScreen() {
     } finally {
       setLoading(false);
     }
-  }, [form, membershipType, isCustomDuration, customDays, selectedPlan, validate, router]);
+  }, [appUserId, form, isCustomDuration, customDays, selectedPlan, validate, router]);
 
   /* ── Render ── */
   return (
@@ -336,6 +372,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 12,
     marginTop: 12,
+    color: "#0A1E5E",
+    fontFamily: DEFAULT_FONT_FAMILY,
+    fontSize: 16,
   },
   webDate: {
     height: 50, borderRadius: 10, padding: 10,

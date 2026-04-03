@@ -36,7 +36,6 @@ export default function MemberScreen() {
   );
 
   useEffect(() => {
-    debugger;
     if (!userId) return;
     fetchMembers();
   }, [userId]);
@@ -56,7 +55,6 @@ export default function MemberScreen() {
       setLoading(false);
       return;
     }
-debugger;
     const apiResponse = data;
 
     if (apiResponse?.status !== 1) {
@@ -64,7 +62,6 @@ debugger;
       setLoading(false);
       return;
     }
-    debugger;
     const formattedData: Member[] = (apiResponse.data || []).map(
       (item: any) => ({
         id: String(item.member_id),
@@ -76,7 +73,6 @@ debugger;
         avatar: "https://i.pravatar.cc/150",
       })
     );
-debugger;
     setMembers(formattedData);
     setLoading(false);
   };
