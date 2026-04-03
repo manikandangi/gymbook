@@ -111,7 +111,7 @@ export default function AddMemberScreen() {
     })), [membershipData]);
 
   const selectedPlan = useMemo(() =>
-    membershipData.find(item => item.membership_type_id === membershipType),
+    membershipData.find(item => item.duration_days === membershipType),
     [membershipData, membershipType]);
 
   const isCustomDuration = selectedPlan?.duration_days === 1;
@@ -148,10 +148,10 @@ export default function AddMemberScreen() {
         ? localStorage.getItem("userid")
         : await AsyncStorage.getItem("userid");
 
-      const durationDays = isCustomDuration
+      let durationDays = isCustomDuration
         ? Number(customDays)
         : selectedPlan?.duration_days;
-
+        debugger;
       const { error } = await supabase.rpc("ufn_create_member_v1", {
         in_applicationuserid: userId,
         in_first_name:        form.name,
