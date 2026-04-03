@@ -1,13 +1,35 @@
 import "react-native-reanimated";
 
+import { Fonts } from "@/constants/theme";
 import { AuthContext, useAuth } from "@/contexts/auth";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
+import { Platform, Text, TextInput } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+
+const defaultFontFamily =
+  Platform.OS === "ios"
+    ? Fonts?.ios?.sans ?? "System"
+    : Platform.OS === "android"
+    ? Fonts?.default?.sans ?? "sans-serif"
+    : Fonts?.web?.sans ?? "system-ui";
+
+if (Text.defaultProps == null) Text.defaultProps = {};
+if (TextInput.defaultProps == null) TextInput.defaultProps = {};
+
+Text.defaultProps.style = [
+  { fontFamily: defaultFontFamily },
+  Text.defaultProps.style,
+];
+
+TextInput.defaultProps.style = [
+  { fontFamily: defaultFontFamily },
+  TextInput.defaultProps.style,
+];
 
 SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();

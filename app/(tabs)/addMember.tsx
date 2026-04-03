@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -8,14 +7,9 @@ import {
   StyleSheet, Text, TextInput, TouchableOpacity, View
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
+import { supabase } from "../supabaseClient";
 
 const DEFAULT_FONT_FAMILY = Platform.select({ ios: 'System', android: 'sans-serif', web: 'system-ui' });
-
-/* ── Supabase ── */
-const supabase = createClient(
-  "https://vihsrmhbzlejvueultdq.supabase.co",
-  "sb_publishable_HMy-TLDNjSGsWNrgFIRhHw_O_0wJjYb"
-);
 
 /* ── Defaults ── */
 const DEFAULT_STATE = { label: "Tamil Nadu", value: "Tamil Nadu" };

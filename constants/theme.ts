@@ -51,3 +51,11 @@ export const Fonts = Platform.select({
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
 });
+
+export const DEFAULT_FONT_FAMILY =
+  Platform.OS === 'ios'
+    ? Fonts?.ios?.sans ?? 'System'
+    : Platform.OS === 'android'
+    ? Fonts?.default?.sans ?? 'sans-serif'
+    : Fonts?.web?.sans ?? 'system-ui';
+

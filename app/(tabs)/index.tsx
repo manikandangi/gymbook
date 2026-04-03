@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -27,9 +26,6 @@ export default function HomeScreen() {
 
   const fetchDashboard = async () => {
     setLoading(true);
-    const supabaseUrl = "https://vihsrmhbzlejvueultdq.supabase.co";
-    const supabaseKey = "sb_publishable_HMy-TLDNjSGsWNrgFIRhHw_O_0wJjYb";
-    const supabase = createClient(supabaseUrl, supabaseKey);
     const { data, error } = await supabase.rpc("ufn_member_dashboard");
 
     if (error) {

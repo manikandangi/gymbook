@@ -1,4 +1,3 @@
-import { createClient } from "@supabase/supabase-js";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -29,11 +28,6 @@ export default function MemberScreen() {
 
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const supabase = createClient(
-    "https://vihsrmhbzlejvueultdq.supabase.co",
-    "sb_publishable_HMy-TLDNjSGsWNrgFIRhHw_O_0wJjYb"
-  );
 
   useEffect(() => {
     if (!userId) return;
