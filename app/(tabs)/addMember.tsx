@@ -77,7 +77,7 @@ export default function AddMemberScreen() {
         setStateOptions(
           statesRes.data.map((s: any) => ({
             label: s.state_name,
-            value: s.state_name,
+            value: s.state_id,
           }))
         );
       } else {
@@ -89,7 +89,7 @@ export default function AddMemberScreen() {
         setCityOptions(
           citiesRes.data.map((c: any) => ({
             label: c.city_name,
-            value: c.city_name,
+            value: c.city_id,
           }))
         );
       } else {
@@ -107,7 +107,7 @@ export default function AddMemberScreen() {
   const membershipOptions = useMemo(() =>
     membershipData.map(item => ({
       label: `${item.membership_name} (${item.duration_days} days)`,
-      value: item.membership_type_id,
+      value: item.duration_days,
     })), [membershipData]);
 
   const selectedPlan = useMemo(() =>
