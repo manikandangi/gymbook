@@ -90,7 +90,7 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.singleRow}>
-          <WhiteCard label="Today's Leads" value={dashboard["expired_members"] || 0}
+          <WhiteCard label="Expiring" value={dashboard["expired_members"] || 0}
             onPress={() => navigate("/(tabs)/member?userId=3")} />
         </View>
 
