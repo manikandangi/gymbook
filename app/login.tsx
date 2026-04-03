@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -33,8 +34,8 @@ export default function LoginScreen() {
       console.log(data)
       const dataed = data.split('~');
       if (dataed[0] == "0") {
+        await AsyncStorage.setItem("userid", dataed[dataed.length - 1]);        
         router.replace("/(tabs)");
-        localStorage.setItem("userid", dataed[dataed.length - 1]);
       }
       else {
         alert(dataed[1]);
