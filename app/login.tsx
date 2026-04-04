@@ -26,8 +26,8 @@ export default function LoginScreen() {
       alert("Mobile number must be 10 digits");
       return;
     }
-    if (password.length !== 20) {
-      alert("Password must be 20 digits");
+    if (password.length < 6 || password.length > 20) {
+      alert("Password must be between 6 and 20 digits");
       return;
     }
     const { data, error } = await supabase.rpc("app_login_v1", {
@@ -71,7 +71,7 @@ export default function LoginScreen() {
         <View style={styles.passwordBox}>
           <TextInput
             style={styles.passwordInput}
-            placeholder="Password"
+            placeholder="Password (6-20 digits)"
             secureTextEntry={!showPassword}
             value={password}
             onChangeText={(text) => setPassword(text.replace(/[^0-9]/g, ''))}
