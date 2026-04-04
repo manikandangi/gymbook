@@ -1,13 +1,14 @@
 import "react-native-reanimated";
 
 import { Fonts } from "@/constants/theme";
-import { AuthContext, useAuth } from "@/contexts/auth";
+import { AuthContext } from "@/contexts/auth";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect } from "react";
-import { Platform, Text, TextInput } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Platform, Text, TextInput, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -35,20 +36,38 @@ SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
 
 function RootLayoutNav() {
-  const { user, isLoading } = useAuth();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    if (isLoading) return;
+    const checkLogin = async () => {
+      const userid = await AsyncStorage.getItem('userid');
+      setIsLoggedIn(!!userid);
+      setIsLoading(false);
+      SplashScreen.hideAsync();
+    };
+    checkLogin();
+  }, []);
 
-    SplashScreen.hideAsync();
-
-    if (!user) {
-      router.replace("/login");
-    } else {
-      router.replace("/(tabs)");
+  useEffect(() => {
+    if (!isLoading) {
+      if (isLoggedIn) {
+        router.replace("/(tabs)");
+      } else {
+        router.replace("/login");
+      }
     }
-  }, [user, isLoading]);
+  }, [isLoading, isLoggedIn, router]);
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0A1F44' }}>
+        <Text style={{ color: '#fff', fontSize: 24 }}>UFGymBook</Text>
+        <Text style={{ color: '#fff', fontSize: 16, marginTop: 10 }}>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <Stack screenOptions={{ headerShown: false }}>

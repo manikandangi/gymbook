@@ -45,7 +45,7 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Unique Fitness</Text>
+        <Text style={styles.headerTitle}>UFGymBook</Text>
         <View style={styles.headerIcons}>
           <Ionicons name="call-outline" size={22} style={styles.icon} />
           <Ionicons
