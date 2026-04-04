@@ -1,7 +1,7 @@
 import BottomNav from "@/components/BottomNav";
 import { Tabs, usePathname } from "expo-router";
 import React from "react";
-import { View } from "react-native";
+import { SafeAreaView, View } from "react-native";
 
 export default function TabLayout() {
   const pathname = usePathname();
@@ -17,7 +17,7 @@ export default function TabLayout() {
   const shouldHideFooter = hideFooterRoutes.includes(pathname);
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
       {/* Tabs Screens */}
       <Tabs
         screenOptions={{
@@ -39,6 +39,6 @@ export default function TabLayout() {
           <BottomNav />
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 }

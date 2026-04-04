@@ -1,5 +1,4 @@
-import { useAuth } from '@/contexts/auth';
-import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import {
   Calendar,
@@ -10,7 +9,7 @@ import {
   Phone,
   User,
 } from 'lucide-react-native';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Alert,
   ScrollView,
@@ -21,11 +20,17 @@ import {
 } from 'react-native';
 
 export default function ProfileScreen() {
-  const { user, logout } = useAuth();
   const router = useRouter();
-  const navigate = (path: string) => {
-    router.replace("/login");
-  };
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getUserId = async () => {
+      const id = await AsyncStorage.getItem('userid');
+      setUserId(id);
+    };
+    getUserId();
+  }, []);
+
   const handleLogout = () => {
     Alert.alert(
       'Logout',
@@ -36,16 +41,20 @@ export default function ProfileScreen() {
           text: 'Logout',
           style: 'destructive',
           onPress: async () => {
-            await logout();
-            router.push('/login');
+            await AsyncStorage.removeItem('userid');
+            router.replace('/login');
           },
         },
       ]
     );
   };
 
-  if (!user) {
-    return null;
+  if (!userId) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
   }
 
   const getMembershipColor = () => {
@@ -76,78 +85,49 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#1a1a1a', '#0d0d0d']}
-        style={styles.gradient}
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
       >
-        <ScrollView 
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.header}>
-            <View style={styles.avatarContainer}>
-              <LinearGradient
-                colors={[getMembershipColor(), getMembershipColor() + '80']}
-                style={styles.avatarGradient}
-              >
-                <User size={48} color="#fff" strokeWidth={2} />
-              </LinearGradient>
-            </View>
-            <Text style={styles.name}>{user.name}</Text>
-            <View style={styles.membershipBadge}>
-              <Crown size={16} color={getMembershipColor()} />
-              <Text style={[styles.membershipText, { color: getMembershipColor() }]}>
-                {getMembershipLabel()} Member
-              </Text>
-            </View>
+        <View style={styles.header}>
+          <View style={styles.avatarContainer}>
+            <User size={48} color="#fff" strokeWidth={2} />
           </View>
+          <Text style={styles.name}>Gym Admin</Text>
+          <View style={styles.membershipBadge}>
+            <Crown size={16} color="#FFD700" />
+            <Text style={[styles.membershipText, { color: "#FFD700" }]}>
+              Administrator
+            </Text>
+          </View>
+        </View>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Personal Information</Text>
-            
-            <View style={styles.infoCard}>
-              <View style={styles.infoRow}>
-                <View style={styles.infoIconContainer}>
-                  <Mail size={20} color="#ff3b30" />
-                </View>
-                <View style={styles.infoContent}>
-                  <Text style={styles.infoLabel}>Email</Text>
-                  <Text style={styles.infoValue}>{user.email}</Text>
-                </View>
-                <ChevronRight size={20} color="#666" />
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Account Information</Text>
+          
+          <View style={styles.infoCard}>
+            <View style={styles.infoRow}>
+              <View style={styles.infoIconContainer}>
+                <User size={20} color="#ff3b30" />
               </View>
-
-              <View style={styles.divider} />
-
-              <View style={styles.infoRow}>
-                <View style={styles.infoIconContainer}>
-                  <Phone size={20} color="#ff3b30" />
-                </View>
-                <View style={styles.infoContent}>
-                  <Text style={styles.infoLabel}>Phone Number</Text>
-                  <Text style={styles.infoValue}>{user.phoneNumber}</Text>
-                </View>
-                <ChevronRight size={20} color="#666" />
-              </View>
-
-              <View style={styles.divider} />
-
-              <View style={styles.infoRow}>
-                <View style={styles.infoIconContainer}>
-                  <Calendar size={20} color="#ff3b30" />
-                </View>
-                <View style={styles.infoContent}>
-                  <Text style={styles.infoLabel}>Member Since</Text>
-                  <Text style={styles.infoValue}>{formatDate(user.joinDate)}</Text>
-                </View>
-                <ChevronRight size={20} color="#666" />
+              <View style={styles.infoContent}>
+                <Text style={styles.infoLabel}>User ID</Text>
+                <Text style={styles.infoValue}>{userId}</Text>
               </View>
             </View>
           </View>
+        </View>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Membership</Text>
+        <View style={styles.section}>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <LogOut size={20} color="#fff" />
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
+  );
             
             <View style={styles.membershipCard}>
               <LinearGradient
@@ -193,15 +173,19 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  gradient: {
-    flex: 1,
+    backgroundColor: '#1a1a1a',
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     paddingBottom: 40,
+  },
+  loadingText: {
+    color: '#fff',
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 50,
   },
   header: {
     alignItems: 'center',
@@ -210,133 +194,91 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   avatarContainer: {
-    marginBottom: 16,
-  },
-  avatarGradient: {
     width: 120,
     height: 120,
     borderRadius: 60,
+    backgroundColor: '#FFD700',
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 16,
   },
   name: {
     fontSize: 28,
-    fontWeight: '700' as const,
+    fontWeight: 'bold',
     color: '#fff',
     marginBottom: 8,
   },
   membershipBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
   },
   membershipText: {
     fontSize: 14,
-    fontWeight: '600' as const,
+    fontWeight: '600',
+    marginLeft: 6,
   },
   section: {
     paddingHorizontal: 24,
-    marginBottom: 32,
+    marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: '700' as const,
+    fontWeight: 'bold',
     color: '#fff',
     marginBottom: 16,
   },
   infoCard: {
-    backgroundColor: '#1f1f1f',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 16,
-    padding: 4,
+    padding: 16,
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    paddingVertical: 12,
   },
   infoIconContainer: {
     width: 40,
     height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 59, 48, 0.1)',
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: 16,
   },
   infoContent: {
     flex: 1,
   },
   infoLabel: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#999',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   infoValue: {
     fontSize: 16,
     color: '#fff',
-    fontWeight: '500' as const,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#333',
-    marginLeft: 68,
-  },
-  membershipCard: {
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  membershipCardGradient: {
-    padding: 24,
-  },
-  membershipCardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 12,
-  },
-  membershipCardTitle: {
-    fontSize: 22,
-    fontWeight: '700' as const,
-    color: '#fff',
-  },
-  membershipCardDescription: {
-    fontSize: 15,
-    color: '#ccc',
-    lineHeight: 22,
-    marginBottom: 20,
-  },
-  upgradeButton: {
-    backgroundColor: '#ff3b30',
-    borderRadius: 12,
-    padding: 14,
-    alignItems: 'center',
-  },
-  upgradeButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600' as const,
+    fontWeight: '500',
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 12,
-    marginHorizontal: 24,
-    marginTop: 8,
-    padding: 18,
+    backgroundColor: '#ff3b30',
+    paddingVertical: 16,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#ff3b30',
-    backgroundColor: 'rgba(255, 59, 48, 0.1)',
+    marginHorizontal: 24,
   },
-  logoutButtonText: {
-    fontSize: 17,
-    fontWeight: '600' as const,
-    color: '#ff3b30',
+  logoutText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+});
   },
   bottomPadding: {
     height: 20,

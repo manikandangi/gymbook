@@ -4,6 +4,8 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
+  KeyboardAvoidingView,
+  Platform,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -21,6 +23,7 @@ type Member = {
   plan: string;
   expired: boolean;
   avatar: string;
+  expiryDate: string;
 };
 
 export default function MemberScreen() {
@@ -29,6 +32,7 @@ export default function MemberScreen() {
 
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
     if (!userId) return;
@@ -66,11 +70,19 @@ export default function MemberScreen() {
         plan: "One month plan",
         expired: new Date(item.expiry_date) < new Date(),
         avatar: "https://i.pravatar.cc/150",
+        expiryDate: item.expiry_date,
       })
     );
     setMembers(formattedData);
     setLoading(false);
   };
+
+  const filteredMembers = members
+    .filter(member =>
+      member.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      member.phone.includes(searchText)
+    )
+    .sort((a, b) => new Date(b.expiryDate).getTime() - new Date(a.expiryDate).getTime());
 
   const renderItem = ({ item }: { item: Member }) => (
     <TouchableOpacity
@@ -109,56 +121,62 @@ export default function MemberScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Members</Text>
-      </View>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Members</Text>
+        </View>
 
-      {/* Search */}
-      <View style={styles.searchRow}>
-        <TextInput
-          placeholder="Search for name or phone"
-          placeholderTextColor="#9AA4B2"
-          style={styles.searchInput}
+        {/* Search */}
+        <View style={styles.searchRow}>
+          <TextInput
+            placeholder="Search for name or phone"
+            placeholderTextColor="#9AA4B2"
+            style={styles.searchInput}
+          value={searchText}
+          onChangeText={setSearchText}
         />
 
-        <TouchableOpacity style={styles.squareBtn}>
+        <TouchableOpacity style={styles.squareBtn} onPress={() => router.push("/(tabs)/addMember")}>
           <Text style={styles.squareBtnText}>＋</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.squareBtnOutline} />
-      </View>
-
-      {/* Filters */}
-      <View style={styles.filterRow}>
-        <View style={styles.filterChip}>
-          <Text style={styles.filterText}>Expired in last 30 days</Text>
         </View>
 
-        <View style={styles.filterChip}>
-          <Text style={styles.filterText}>Sorted By Expiry - Desc</Text>
+        {/* Filters */}
+        <View style={styles.filterRow}>
+          <View style={styles.filterChip}>
+            <Text style={styles.filterText}>Expired in last 30 days</Text>
+          </View>
+
+          <View style={styles.filterChip}>
+            <Text style={styles.filterText}>Sorted By Expiry - Desc</Text>
+          </View>
         </View>
-      </View>
 
-      {/* Count */}
-      <Text style={styles.showing}>
-        {loading ? "Loading..." : `Showing ${members.length} Members`}
-      </Text>
+        {/* Count */}
+        <Text style={styles.showing}>
+        {loading ? "Loading..." : `Showing ${filteredMembers.length} Members`}
 
-      {/* Loader or List */}
-      {loading ? (
-        <ActivityIndicator size="large" style={{ marginTop: 40 }} />
-      ) : (
-        <FlatList
-          data={members}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 120 }}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
-    </SafeAreaView>
+        {/* Loader or List */}
+        {loading ? (
+          <ActivityIndicator size="large" style={{ marginTop: 40 }} />
+        ) : (
+          <FlatList
+            data={filteredMembers}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={{ paddingBottom: 120 }}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 

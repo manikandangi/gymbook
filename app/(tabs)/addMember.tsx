@@ -246,8 +246,12 @@ export default function AddMemberScreen() {
             style={{ flex: 1 }}
             keyboardType="phone-pad"
             value={form.phone}
-            onChangeText={set("phone")}
+            onChangeText={(text) => {
+    const numeric = text.replace(/[^0-9]/g, ""); // remove non-numbers
+    set("phone")(numeric);
+  }}
             maxLength={10}
+            
           />
         </View>
 
@@ -339,7 +343,20 @@ export default function AddMemberScreen() {
 
         {/* Emergency */}
         <Field placeholder="Emergency Name"  value={form.emgName}  onChangeText={set("emgName")}  maxLength={50} />
-        <Field placeholder="Emergency Phone" value={form.emgPhone} onChangeText={set("emgPhone")} maxLength={10} />
+        <View style={styles.row}>
+          <View style={styles.codeBox}><Text>+91</Text></View>
+          <Field
+            placeholder="Emergency Phone"
+            style={{ flex: 1 }}
+            keyboardType="phone-pad"
+            value={form.emgPhone}
+            onChangeText={(text) => {
+              const numeric = text.replace(/[^0-9]/g, ""); // remove non-numbers
+              set("emgPhone")(numeric);
+            }}
+            maxLength={10}
+          />
+        </View>
 
         {/* Submit */}
         <TouchableOpacity style={styles.button} onPress={handleSave} disabled={loading}>
@@ -353,9 +370,9 @@ export default function AddMemberScreen() {
 
 /* ── Styles ── */
 const pickerStyles = {
-  inputIOS:     { padding: 14 },
-  inputAndroid: { padding: 12 },
-  inputWeb:     { padding: 12, borderWidth: 0, outlineWidth: 0 },
+  inputIOS:     { padding: 14, color: "#0A1E5E", placeholderTextColor: "#6c7587" },
+  inputAndroid: { padding: 12, color: "#0A1E5E", placeholderTextColor: "#6c7587" },
+  inputWeb:     { padding: 12, borderWidth: 0, outlineWidth: 0, color: "#0A1E5E", placeholderTextColor: "#6c7587" },
 };
 
 const styles = StyleSheet.create({

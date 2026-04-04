@@ -18,9 +18,21 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      alert("Please enter mobile number and password");
+      return;
+    }
+    if (email.length !== 10) {
+      alert("Mobile number must be 10 digits");
+      return;
+    }
+    if (password.length !== 20) {
+      alert("Password must be 20 digits");
+      return;
+    }
     const { data, error } = await supabase.rpc("app_login_v1", {
-      in_mobileno: email,
-      in_password: password,
+      in_mobileno: email.trim(),
+      in_password: password.trim(),
       in_ipaddress: "127.0.0.1",
     });
     if (error) {
@@ -51,7 +63,9 @@ export default function LoginScreen() {
           style={styles.input}
           placeholder="Mobile NO"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => setEmail(text.replace(/[^0-9]/g, ''))}
+          keyboardType="numeric"
+          maxLength={10}
         />
 
         <View style={styles.passwordBox}>
@@ -60,7 +74,9 @@ export default function LoginScreen() {
             placeholder="Password"
             secureTextEntry={!showPassword}
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(text) => setPassword(text.replace(/[^0-9]/g, ''))}
+            keyboardType="numeric"
+            maxLength={20}
           />
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <Ionicons
@@ -96,6 +112,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 16,
     marginBottom: 20,
+    color: "#000",
+    placeholderTextColor: "#000",
   },
   passwordBox: {
     flexDirection: "row",
@@ -106,7 +124,7 @@ const styles = StyleSheet.create({
     height: 50,
     marginBottom: 20,
   },
-  passwordInput: { flex: 1 },
+  passwordInput: { flex: 1, color: "#000", placeholderTextColor: "#000" },
   loginBtn: {
     backgroundColor: "#0A1F44",
     height: 52,

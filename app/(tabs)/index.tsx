@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -16,13 +17,15 @@ export default function HomeScreen() {
   const [dashboard, setDashboard] = useState<any>({});
   const [loading, setLoading] = useState(false);
 
-  const navigate = (path: string) => {
-    router.push(path);
+  const navigate = (path: string, params?: Record<string, string>) => {
+    router.push({ pathname: path as any, params });
   };
 
-  useEffect(() => {
-    fetchDashboard();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchDashboard();
+    }, [])
+  );
 
   const fetchDashboard = async () => {
     setLoading(true);
@@ -61,13 +64,13 @@ export default function HomeScreen() {
             label="Active Members"
             value={dashboard["active_members"] || 0}
             colors={["#3B82F6", "#2563EB"]}
-            onPress={() => navigate("/(tabs)/member?userId=2")}
+            onPress={() => navigate("/(tabs)/member", { userId: "2" })}
           />
           <StatCard
             label="Expired in 30 days"
             value={dashboard["expiring_in_30_days"] || 0}
             colors={["#EF4444", "#DC2626"]}
-            onPress={() => navigate("/(tabs)/member?userId=4")}
+            onPress={() => navigate("/(tabs)/member", { userId: "4" })}
           />
         </View>
 
@@ -76,18 +79,18 @@ export default function HomeScreen() {
             label="Expiring in 10 days"
             value={dashboard["expiring_in_10_days"] || 0}
             highlight
-            onPress={() => navigate("/(tabs)/member?userId=5")}
+            onPress={() => navigate("/(tabs)/member", { userId: "5" })}
           />
           <WhiteCard
             label="Total Members"
             value={dashboard["total_members"] || 0}
-            onPress={() => navigate("/(tabs)/member?userId=1")}
+            onPress={() => navigate("/(tabs)/member", { userId: "1" })}
           />
         </View>
 
         <View style={styles.singleRow}>
           <WhiteCard label="Expiring" value={dashboard["expired_members"] || 0}
-            onPress={() => navigate("/(tabs)/member?userId=3")} />
+            onPress={() => navigate("/(tabs)/member", { userId: "3" })} />
         </View>
 
         {/* Quick Reports */}
