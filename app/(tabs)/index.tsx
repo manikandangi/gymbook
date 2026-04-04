@@ -3,12 +3,13 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-  SafeAreaView,
+  Platform,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { supabase } from "../supabaseClient";
 export default function HomeScreen() {
@@ -42,7 +43,8 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#F5F6FA" />
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>UFGymBook</Text>
@@ -57,7 +59,7 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Top Cards */}
         <View style={styles.row}>
           <StatCard
@@ -129,7 +131,7 @@ export default function HomeScreen() {
           <Text style={styles.muted}>No member with balance</Text>
         </View> */}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -177,7 +179,11 @@ const ReportItem = ({ label, value }: any) => (
 );
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F5F6FA" },
+  container: {
+    flex: 1,
+    backgroundColor: "#F5F6FA",
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 44, // approx safe area top for iOS
+  },
 
   header: {
     flexDirection: "row",
@@ -191,6 +197,7 @@ const styles = StyleSheet.create({
 
   row: { flexDirection: "row", paddingHorizontal: 16, marginBottom: 12 },
   singleRow: { paddingHorizontal: 16, marginBottom: 12 },
+  scrollContent: { paddingBottom: 120 },
 
   statCard: {
     flex: 1,

@@ -56,17 +56,17 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
+        {/* <View style={styles.header}>
           <View style={styles.avatarContainer}>
             <User size={48} color="#fff" strokeWidth={2} />
           </View>
           <Text style={styles.name}>Gym Admin</Text>
           <View style={styles.membershipBadge}>
-            <Text style={[styles.membershipText, { color: "#FFD700" }]}>
+            <Text style={[styles.membershipText, { color: "#FFD700" }]}> 
               Administrator
             </Text>
           </View>
-        </View>
+        </View> */}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account Information</Text>

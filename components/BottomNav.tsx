@@ -6,24 +6,51 @@ import NavItem from './NavItem';
 
 const BottomNav: React.FC = () => {
   return (
-    <View style={styles.bottomNav}>
-      <NavItem icon="home-outline" label="Dashboard" active href="/(tabs)"/>
-      <NavItem icon="people-outline" label="Members" href="/(tabs)/member?userId=0" />
-      <BottomSheetWithFAB />
-      <NavItem icon="card-outline" label="Transactions" href="/(tabs)/transactions"/>
-      <NavItem icon="stats-chart-outline" label="Reports" href="/(tabs)/reports"/>
+    <View style={styles.outerShadow}>
+      <View style={styles.bottomNav}>
+        <NavItem icon="home-outline" label="Dashboard" active href="/(tabs)"/>
+        <NavItem icon="people-outline" label="Members" href="/(tabs)/member?userId=0" />
+        <View style={styles.fabContainer}><BottomSheetWithFAB /></View>
+        <NavItem icon="card-outline" label="Transactions" href="/(tabs)/transactions"/>
+        <NavItem icon="stats-chart-outline" label="Reports" href="/(tabs)/reports"/>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  outerShadow: {
+    backgroundColor: 'transparent',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 12,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
+    overflow: 'visible',
+  },
   bottomNav: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#ddd',
+    paddingHorizontal: 18,
     backgroundColor: '#fff',
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
+    minHeight: 64,
+  },
+  fabContainer: {
+    marginTop: -28,
+    zIndex: 2,
+    backgroundColor: 'transparent',
+    borderRadius: 32,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    elevation: 8,
   },
 });
 

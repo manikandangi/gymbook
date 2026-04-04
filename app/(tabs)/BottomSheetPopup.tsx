@@ -1,23 +1,24 @@
 import {
-  BottomSheetModal,
-  BottomSheetView,
+    BottomSheetModal,
+    BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
 import {
-  FileText,
-  Plus,
-  Receipt,
-  UserPlus,
-  Users,
+    FileText,
+    Plus,
+    Receipt,
+    UserPlus,
+    Users,
 } from "lucide-react-native";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
-  Modal,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Modal,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 export default function BottomSheetWithFAB() {
@@ -70,13 +71,17 @@ export default function BottomSheetWithFAB() {
 
               {/* Grid */}
               <View style={styles.gridCard}>
-                <View style={styles.grid}>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.grid}
+                >
                   <MenuItem icon={<Users size={22} />} label="Member" onPress={() => navigate("/(tabs)/addMember")} />
                   <MenuItem icon={<UserPlus size={22} />} label="Staff" onPress={() => navigate("/(tabs)/AddStaffScreen")} />
                   <MenuItem icon={<FileText size={22} />} label="Plan" onPress={() => navigate("/(tabs)/NewPlan")} />
                   <MenuItem icon={<Receipt size={22} />} label="Leads" onPress={() => navigate("/(tabs)/Leeds")} />
                   <MenuItem icon={<Receipt size={22} />} label="Expense" onPress={() => navigate("/(tabs)/CreateExpenseScreen")} />
-                </View>
+                </ScrollView>
               </View>
 
               <Text style={styles.section}>Other Actions</Text>
@@ -98,11 +103,17 @@ export default function BottomSheetWithFAB() {
           <View style={styles.overlay} />
           <View style={styles.webSheet}>
             <View style={styles.container}>
-                 <MenuItem icon={<Users size={22} />} label="Member" onPress={() => navigate("/(tabs)/addMember")} />
+                 <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.grid}
+                >
+                  <MenuItem icon={<Users size={22} />} label="Member" onPress={() => navigate("/(tabs)/addMember")} />
                   <MenuItem icon={<UserPlus size={22} />} label="Staff" onPress={() => navigate("/(tabs)/AddStaffScreen")} />
                   <MenuItem icon={<FileText size={22} />} label="Plan" onPress={() => navigate("/(tabs)/NewPlan")} />
                   <MenuItem icon={<Receipt size={22} />} label="Leads" onPress={() => navigate("/(tabs)/Leeds")} />
                   <MenuItem icon={<Receipt size={22} />} label="Expense" onPress={() => navigate("/(tabs)/CreateExpenseScreen")} />
+                </ScrollView>
             </View>
           </View>
         </Modal>
@@ -182,9 +193,10 @@ const styles = StyleSheet.create({
 
   grid: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
+    flexWrap: "nowrap",
+    justifyContent: "flex-start",
     gap: 26,
+    paddingHorizontal: 12,
   },
 
   menuItem: {

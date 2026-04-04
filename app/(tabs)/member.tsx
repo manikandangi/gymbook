@@ -46,7 +46,7 @@ export default function MemberScreen() {
       "ufn_get_members_by_type",
       {
         in_type: Number(userId),
-      }
+  export default function MemberScreen() {
     );
 
     if (error) {
@@ -88,9 +88,9 @@ export default function MemberScreen() {
     <TouchableOpacity
       onPress={() =>
         router.push({
-          pathname: "/memberDetails",
+          pathname: "/memberDetails" as any,
           params: { member: JSON.stringify(item) },
-        })
+        } as any)
       }
     >
       <View style={styles.card}>
@@ -141,7 +141,7 @@ export default function MemberScreen() {
           onChangeText={setSearchText}
         />
 
-        <TouchableOpacity style={styles.squareBtn} onPress={() => router.push("/(tabs)/addMember")}>
+      <View style={[styles.container, { paddingTop: 16, paddingBottom: 24 }]}> 
           <Text style={styles.squareBtnText}>＋</Text>
         </TouchableOpacity>
 
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
 
-  title: {
+        </View>
     fontSize: 24,
     fontWeight: "700",
     color: "#0B1B3A",

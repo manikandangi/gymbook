@@ -1,9 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Keyboard, Platform, SafeAreaView, ScrollView,
+  Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView,
   StyleSheet, Text, TextInput, TouchableOpacity, View
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
@@ -24,8 +25,8 @@ const INITIAL_FORM = {
   dob:       "",
   gender:    "Male",
   address:   "",
-  city:      DEFAULT_CITY.value,
-  stateName: DEFAULT_STATE.value,
+  city:      "",
+  stateName: "",
   pincode:   "",
   height:    "",
   weight:    "",
@@ -60,6 +61,14 @@ export default function AddMemberScreen() {
   const [loading, setLoading]               = useState(false);
 
   const [appUserId, setAppUserId] = useState<string | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      setForm({ ...INITIAL_FORM });
+      setMembershipType(null);
+      setCustomDays("");
+    }, [])
+  );
 
   useEffect(() => {
     (async () => {
@@ -219,191 +228,256 @@ export default function AddMemberScreen() {
   /* ── Render ── */
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      >
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          contentInset={{ bottom: 120 }}
+          contentContainerStyle={[styles.outerContent, styles.scrollContent]}
+        >
+          <View style={styles.card}>
+            {/* Header */}
+            <View style={styles.headerRow}>
+              <TouchableOpacity onPress={() => {
+                setForm({ ...INITIAL_FORM });
+                setMembershipType(null);
+                setCustomDays("");
+                router.back();
+              }}>
+                <Text style={styles.close}>✕</Text>
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Add New Member</Text>
+              <View style={{ width: 24 }} />
+            </View>
 
-        {/* Header */}
-         <View style={styles.header}>
-          <TouchableOpacity onPress={() => {
-            setForm({ ...INITIAL_FORM });
-            setMembershipType(null);
-            setCustomDays("");
-            router.back();
-          }}>
-            <Text style={styles.close}>✕</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>New Member</Text>
-          <View style={{ width: 24 }} />
-        </View>
-
-        {/* Personal */}
-        <Field placeholder="First Name" value={form.name}     onChangeText={set("name")}     maxLength={50} />
-        <Field placeholder="Last Name"  value={form.lastName} onChangeText={set("lastName")} maxLength={50} />
-
-        <View style={styles.row}>
-          <View style={styles.codeBox}><Text>+91</Text></View>
-          <Field
-            placeholder="Phone"
-            style={{ flex: 1 }}
-            keyboardType="phone-pad"
-            value={form.phone}
-            onChangeText={(text) => {
-    const numeric = text.replace(/[^0-9]/g, ""); // remove non-numbers
-    set("phone")(numeric);
-  }}
-            maxLength={10}
-            
-          />
-        </View>
-
-        <Field placeholder="Email" value={form.email} onChangeText={set("email")} maxLength={50} />
-
-        {/* DOB */}
-        {Platform.OS === "web" ? (
-          <input
-            type="date"
-            value={form.dob}
-            onChange={e => set("dob")(e.target.value)}
-            style={styles.webDate as any}
-          />
-        ) : (
-          <>
-            <TouchableOpacity style={styles.input} onPress={() => setShowDatePicker(true)}>
-              <Text>{form.dob || "Select Date of Birth"}</Text>
-            </TouchableOpacity>
-            {showDatePicker && (
-              <DateTimePicker
-                value={form.dob ? new Date(form.dob) : new Date()}
-                mode="date"
-                maximumDate={new Date()}
-                onChange={(_, d) => {
-                  setShowDatePicker(false);
-                  if (d) set("dob")(d.toISOString().split("T")[0]);
+            {/* Section: Personal */}
+            <Text style={styles.sectionTitle}>Personal Details</Text>
+            <Field placeholder="First Name" value={form.name}     onChangeText={set("name")}     maxLength={50} />
+            <Field placeholder="Last Name"  value={form.lastName} onChangeText={set("lastName")} maxLength={50} />
+            <View style={styles.row}>
+              <View style={styles.codeBox}><Text>+91</Text></View>
+              <Field
+                placeholder="Phone"
+                style={{ flex: 1 }}
+                keyboardType="phone-pad"
+                value={form.phone}
+                onChangeText={(text) => {
+                  const numeric = text.replace(/[^0-9]/g, "");
+                  set("phone")(numeric);
                 }}
+                maxLength={10}
+              />
+            </View>
+            <Field placeholder="Email" value={form.email} onChangeText={set("email")} maxLength={50} />
+            {Platform.OS === "web" ? (
+              <input
+                type="date"
+                value={form.dob}
+                onChange={e => set("dob")(e.target.value)}
+                style={styles.webDate as any}
+              />
+            ) : (
+              <>
+                <TouchableOpacity style={styles.input} onPress={() => setShowDatePicker(true)}>
+                  <Text>{form.dob || "Select Date of Birth"}</Text>
+                </TouchableOpacity>
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={form.dob ? new Date(form.dob) : new Date()}
+                    mode="date"
+                    maximumDate={new Date()}
+                    onChange={(_, d) => {
+                      setShowDatePicker(false);
+                      if (d) set("dob")(d.toISOString().split("T")[0]);
+                    }}
+                  />
+                )}
+              </>
+            )}
+            <Field
+              placeholder="Address"
+              value={form.address}
+              onChangeText={set("address")}
+              style={{ height: 80 }}
+              multiline
+            />
+            <Field placeholder="Pincode" value={form.pincode} onChangeText={set("pincode")} maxLength={6} />
+            <View style={styles.divider} />
+
+            {/* Section: Location & Membership */}
+            <Text style={styles.sectionTitle}>Location & Membership</Text>
+            <View style={styles.dropdownWrapper}>
+              <RNPickerSelect
+                onValueChange={val => set("stateName")(val ?? "")}
+                items={stateOptions}
+                value={form.stateName}
+                style={pickerStyles}
+                placeholder={{ label: "Select State", value: null, color: "#0A1E5E" }}
+              />
+            </View>
+            <View style={styles.dropdownWrapper}>
+              <RNPickerSelect
+                onValueChange={val => set("city")(val ?? "")}
+                items={cityOptions}
+                value={form.city}
+                style={pickerStyles}
+                placeholder={{ label: "Select City", value: null, color: "#0A1E5E" }}
+              />
+            </View>
+            <View style={styles.dropdownWrapper}>
+              <RNPickerSelect
+                onValueChange={setMembershipType}
+                items={membershipOptions}
+                value={membershipType}
+                style={pickerStyles}
+                placeholder={{ label: "Select Membership Type", value: null, color: "#0A1E5E" }}
+              />
+            </View>
+            {isCustomDuration && (
+              <Field
+                placeholder="Enter number of days"
+                keyboardType="numeric"
+                value={customDays}
+                onChangeText={setCustomDays}
+                maxLength={4}
               />
             )}
-          </>
-        )}
+            <View style={styles.divider} />
 
-        {/* Address */}
-        <Field
-          placeholder="Address"
-          value={form.address}
-          onChangeText={set("address")}
-          style={{ height: 80 }}
-          multiline
-        />
-        <Field placeholder="Pincode" value={form.pincode} onChangeText={set("pincode")} maxLength={6} />
+            {/* Section: Health */}
+            <Text style={styles.sectionTitle}>Health</Text>
+            <Field placeholder="Height (cm)" value={form.height} onChangeText={set("height")} maxLength={5} />
+            <Field placeholder="Weight (kg)" value={form.weight} onChangeText={set("weight")} maxLength={5} />
+            <View style={styles.divider} />
 
-        {/* State Dropdown */}
-        <View style={styles.dropdownWrapper}>
-          <RNPickerSelect
-            onValueChange={val => set("stateName")(val ?? "")}
-            items={stateOptions}
-            value={form.stateName}
-            style={pickerStyles}
-            placeholder={{ label: "Select State", value: null }}
-          />
-        </View>
+            {/* Section: Emergency */}
+            <Text style={styles.sectionTitle}>Emergency Contact</Text>
+            <Field placeholder="Emergency Name"  value={form.emgName}  onChangeText={set("emgName")}  maxLength={50} />
+            <View style={styles.row}>
+              <View style={styles.codeBox}><Text>+91</Text></View>
+              <Field
+                placeholder="Emergency Phone"
+                style={{ flex: 1 }}
+                keyboardType="phone-pad"
+                value={form.emgPhone}
+                onChangeText={(text) => {
+                  const numeric = text.replace(/[^0-9]/g, "");
+                  set("emgPhone")(numeric);
+                }}
+                maxLength={10}
+              />
+            </View>
 
-        {/* City Dropdown */}
-        <View style={styles.dropdownWrapper}>
-          <RNPickerSelect
-            onValueChange={val => set("city")(val ?? "")}
-            items={cityOptions}
-            value={form.city}
-            style={pickerStyles}
-            placeholder={{ label: "Select City", value: null }}
-          />
-        </View>
-
-        {/* Membership */}
-        <View style={styles.dropdownWrapper}>
-          <RNPickerSelect
-            onValueChange={setMembershipType}
-            items={membershipOptions}
-            value={membershipType}
-            style={pickerStyles}
-            placeholder={{ label: "Select Membership Type", value: null }}
-          />
-        </View>
-
-        {isCustomDuration && (
-          <Field
-            placeholder="Enter number of days"
-            keyboardType="numeric"
-            value={customDays}
-            onChangeText={setCustomDays}
-            maxLength={4}
-          />
-        )}
-
-        {/* Health */}
-        <Field placeholder="Height (cm)" value={form.height} onChangeText={set("height")} maxLength={5} />
-        <Field placeholder="Weight (kg)" value={form.weight} onChangeText={set("weight")} maxLength={5} />
-
-        {/* Emergency */}
-        <Field placeholder="Emergency Name"  value={form.emgName}  onChangeText={set("emgName")}  maxLength={50} />
-        <View style={styles.row}>
-          <View style={styles.codeBox}><Text>+91</Text></View>
-          <Field
-            placeholder="Emergency Phone"
-            style={{ flex: 1 }}
-            keyboardType="phone-pad"
-            value={form.emgPhone}
-            onChangeText={(text) => {
-              const numeric = text.replace(/[^0-9]/g, ""); // remove non-numbers
-              set("emgPhone")(numeric);
-            }}
-            maxLength={10}
-          />
-        </View>
-
-        {/* Submit */}
-        <TouchableOpacity style={styles.button} onPress={handleSave} disabled={loading}>
-          <Text style={styles.buttonText}>{loading ? "Saving…" : "Add Member"}</Text>
-        </TouchableOpacity>
-
-      </ScrollView>
+            {/* Submit */}
+            <TouchableOpacity style={styles.button} onPress={handleSave} disabled={loading}>
+              <Text style={styles.buttonText}>{loading ? "Saving…" : "Add Member"}</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 /* ── Styles ── */
 const pickerStyles = {
-  inputIOS:     { padding: 14, color: "#0A1E5E", placeholderTextColor: "#6c7587" },
-  inputAndroid: { padding: 12, color: "#0A1E5E", placeholderTextColor: "#6c7587" },
-  inputWeb:     { padding: 12, borderWidth: 0, outlineWidth: 0, color: "#0A1E5E", placeholderTextColor: "#6c7587" },
+  inputIOS: {
+    padding: 14,
+    color: "#0A1E5E",
+    backgroundColor: "#E6EAF0",
+    borderRadius: 10,
+  },
+  inputAndroid: {
+    padding: 12,
+    color: "#0A1E5E",
+    backgroundColor: "#E6EAF0",
+    borderRadius: 10,
+  },
+  inputWeb: {
+    padding: 12,
+    borderWidth: 0,
+    outlineWidth: 0,
+    color: "#0A1E5E",
+    backgroundColor: "#E6EAF0",
+    borderRadius: 10,
+  },
 };
 
 const styles = StyleSheet.create({
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: '#0A1E5E',
+      marginTop: 18,
+      marginBottom: 2,
+      letterSpacing: 0.1,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: '#E6EAF0',
+      marginVertical: 18,
+      borderRadius: 2,
+    },
   safe:            { flex: 1, backgroundColor: "#F5F6F8" },
-  container:       { padding: 20 },
+  flex:            { flex: 1 },
+  outerContent:    { padding: 18, paddingTop: 32, paddingBottom: 32 },
+  scrollContent:   { paddingBottom: 160 },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 22,
+    padding: 22,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 8,
+    marginBottom: 24,
+  },
   input: {
     backgroundColor: "#E6EAF0",
     borderRadius: 10,
-    padding: 12,
-    marginTop: 12,
+    padding: 14,
+    marginTop: 14,
     color: "#0A1E5E",
     fontFamily: DEFAULT_FONT_FAMILY,
     fontSize: 16,
   },
   webDate: {
     height: 50, borderRadius: 10, padding: 10,
-    marginTop: 12, border: "none", backgroundColor: "#E6EAF0",
+    marginTop: 14, border: "none", backgroundColor: "#E6EAF0",
   },
-  row:             { flexDirection: "row", gap: 10 },
+  row:             { flexDirection: "row", gap: 10, marginTop: 14 },
   codeBox: {
     width: 70, height: 50, backgroundColor: "#E6EAF0",
     borderRadius: 10, justifyContent: "center",
-    alignItems: "center", marginTop: 12,
+    alignItems: "center",
   },
-  dropdownWrapper: { backgroundColor: "#E6EAF0", borderRadius: 10, marginTop: 12 },
+  dropdownWrapper: {
+    backgroundColor: "#E6EAF0",
+    borderRadius: 10,
+    marginTop: 14,
+    justifyContent: "center",
+    minHeight: 54,
+    paddingHorizontal: 10,
+  },
   button: {
-    backgroundColor: "#0A1E5E", padding: 15,
-    borderRadius: 10, marginTop: 20, alignItems: "center",
+    backgroundColor: "#0A1E5E",
+    padding: 18,
+    borderRadius: 12,
+    marginTop: 28,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.10,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  buttonText:      { color: "#fff", fontWeight: "600" },
-  header:          { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  close:           { fontSize: 20 },
-  headerTitle:     { fontSize: 18, fontWeight: "600" },
+  buttonText:      { color: "#fff", fontWeight: "700", fontSize: 17, letterSpacing: 0.5 },
+  headerRow:       { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 18 },
+  close:           { fontSize: 22, color: "#0A1E5E" },
+  headerTitle:     { fontSize: 22, fontWeight: "700", color: "#0A1E5E" },
 });
