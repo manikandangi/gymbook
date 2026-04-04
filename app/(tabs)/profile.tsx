@@ -1,22 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
+import { LogOut, User } from 'lucide-react-native';
+import React, { useEffect, useState } from 'react';
 import {
-  Calendar,
-  ChevronRight,
-  Crown,
-  LogOut,
-  Mail,
-  Phone,
-  User,
-} from 'lucide-react-native';
-import React, { useState, useEffect } from 'react';
-import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 export default function ProfileScreen() {
@@ -57,32 +49,6 @@ export default function ProfileScreen() {
     );
   }
 
-  const getMembershipColor = () => {
-    switch (user.membershipType) {
-      case 'vip':
-        return '#FFD700';
-      case 'premium':
-        return '#ff3b30';
-      case 'basic':
-        return '#999';
-      default:
-        return '#999';
-    }
-  };
-
-  const getMembershipLabel = () => {
-    return user.membershipType.charAt(0).toUpperCase() + user.membershipType.slice(1);
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
   return (
     <View style={styles.container}>
       <ScrollView 
@@ -96,7 +62,6 @@ export default function ProfileScreen() {
           </View>
           <Text style={styles.name}>Gym Admin</Text>
           <View style={styles.membershipBadge}>
-            <Crown size={16} color="#FFD700" />
             <Text style={[styles.membershipText, { color: "#FFD700" }]}>
               Administrator
             </Text>
@@ -126,46 +91,6 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
-  );
-            
-            <View style={styles.membershipCard}>
-              <LinearGradient
-                colors={[getMembershipColor() + '20', getMembershipColor() + '10']}
-                style={styles.membershipCardGradient}
-              >
-                <View style={styles.membershipCardHeader}>
-                  <Crown size={32} color={getMembershipColor()} />
-                  <Text style={styles.membershipCardTitle}>
-                    {getMembershipLabel()} Membership
-                  </Text>
-                </View>
-                <Text style={styles.membershipCardDescription}>
-                  {user.membershipType === 'vip' && 'All premium features + personal trainer access'}
-                  {user.membershipType === 'premium' && 'Access to all gym facilities and classes'}
-                  {user.membershipType === 'basic' && 'Basic gym access during regular hours'}
-                </Text>
-                <TouchableOpacity style={styles.upgradeButton} activeOpacity={0.8}>
-                  <Text style={styles.upgradeButtonText}>
-                    {user.membershipType === 'vip' ? 'Manage Plan' : 'Upgrade Membership'}
-                  </Text>
-                </TouchableOpacity>
-              </LinearGradient>
-            </View>
-          </View>
-
-          <TouchableOpacity 
-            style={styles.logoutButton}
-            onPress={handleLogout}
-            activeOpacity={0.8}
-          >
-            <LogOut size={20} color="#ff3b30" />
-            <Text style={styles.logoutButtonText} onPress={() => navigate("/login")}>Logout</Text>
-          </TouchableOpacity>
-
-          <View style={styles.bottomPadding} />
-        </ScrollView>
-      </LinearGradient>
     </View>
   );
 }
@@ -277,10 +202,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
-  },
-});
-  },
-  bottomPadding: {
-    height: 20,
   },
 });

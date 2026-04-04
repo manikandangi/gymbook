@@ -161,7 +161,8 @@ export default function MemberScreen() {
 
         {/* Count */}
         <Text style={styles.showing}>
-        {loading ? "Loading..." : `Showing ${filteredMembers.length} Members`}
+          {loading ? "Loading..." : `Showing ${filteredMembers.length} Members`}
+        </Text>
 
         {/* Loader or List */}
         {loading ? (
