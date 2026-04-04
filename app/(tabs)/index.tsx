@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
+import { supabase } from "../supabaseClient";
 export default function HomeScreen() {
   const router = useRouter();
 

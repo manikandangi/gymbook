@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { supabase } from "../supabaseClient";
 
 type Member = {
   id: string;
