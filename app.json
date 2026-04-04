@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "UFGymBook",
-    "slug": "UFGymBook",
+    "slug": "GYMbook",
     "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
