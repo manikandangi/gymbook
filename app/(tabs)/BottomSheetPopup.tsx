@@ -64,28 +64,20 @@ export default function BottomSheetWithFAB() {
           snapPoints={snapPoints}
           enablePanDownToClose
         >
-          <BottomSheetView style={{ flex: 1 }}>
-            {/* 🔥 YOUR MENU UI */}
+          <BottomSheetView style={{ flex: 1, borderTopLeftRadius: 32, borderTopRightRadius: 32, backgroundColor: '#fff', overflow: 'hidden' }}>
+            <View style={styles.dragIndicatorWrapper}>
+              <View style={styles.dragIndicator} />
+            </View>
             <View style={styles.container}>
               <Text style={styles.title}>+ Add New</Text>
-
-              {/* Grid */}
-              <View style={styles.gridCard}>
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.grid}
-                >
-                  <MenuItem icon={<Users size={22} />} label="Member" onPress={() => navigate("/(tabs)/addMember")} />
-                  <MenuItem icon={<UserPlus size={22} />} label="Staff" onPress={() => navigate("/(tabs)/AddStaffScreen")} />
-                  <MenuItem icon={<FileText size={22} />} label="Plan" onPress={() => navigate("/(tabs)/NewPlan")} />
-                  <MenuItem icon={<Receipt size={22} />} label="Leads" onPress={() => navigate("/(tabs)/Leeds")} />
-                  <MenuItem icon={<Receipt size={22} />} label="Expense" onPress={() => navigate("/(tabs)/CreateExpenseScreen")} />
-                </ScrollView>
+              {/* 2x2 Grid */}
+              <View style={styles.grid2x2}>
+                <MenuItem icon={<Users size={28} />} label="Member" onPress={() => navigate("/(tabs)/addMember")} />
+                <MenuItem icon={<UserPlus size={28} />} label="Staff" onPress={() => navigate("/(tabs)/AddStaffScreen")} />
+                <MenuItem icon={<FileText size={28} />} label="Plan" onPress={() => navigate("/(tabs)/NewPlan")} />
+                <MenuItem icon={<Receipt size={28} />} label="Leads" onPress={() => navigate("/(tabs)/Leeds")} />
               </View>
-
               <Text style={styles.section}>Other Actions</Text>
-
               <View style={styles.actionCard}>
                 <ActionItem label="Manage Staff" onPress={() => navigate("/(tabs)/ManageStaff")} />
                 <ActionItem label="Manage Plans" onPress={() => navigate("/(tabs)/ManagePlans")} />
@@ -183,26 +175,36 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
 
-  gridCard: {
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: 16,
-    paddingVertical: 18,
+  grid2x2: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
     marginBottom: 24,
+    gap: 0,
   },
-
-  grid: {
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    justifyContent: "flex-start",
-    gap: 26,
-    paddingHorizontal: 12,
-  },
-
   menuItem: {
-    width: 90,
-    alignItems: "center",
+    width: '48%',
+    alignItems: 'center',
     marginBottom: 22,
+    paddingVertical: 12,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  dragIndicatorWrapper: {
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 8,
+  },
+  dragIndicator: {
+    width: 48,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: '#E5E7EB',
   },
 
   menuText: {

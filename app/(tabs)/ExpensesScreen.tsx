@@ -21,7 +21,7 @@ const ExpensesScreen: React.FC = () => {
   return (
     <SafeAreaView style={[styles.container, { paddingBottom: insets.bottom }]}> 
       {/* Header */}
-      <AppHeader title="Expenses" showSettings onSettingsPress={() => {}} showCall={false} showBack />
+      <AppHeader title="Expenses" showSettings showCall onSettingsPress={() => {}} onCallPress={() => {}} />
 
       {/* Top Buttons */}
       <View style={styles.topButtons}>

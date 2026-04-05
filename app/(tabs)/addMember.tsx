@@ -4,8 +4,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-    Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView,
-    StyleSheet, Text, TextInput, TouchableOpacity, View
+  Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView,
+  StyleSheet, Text, TextInput, TouchableOpacity, View
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { supabase } from "../supabaseClient";
@@ -157,16 +157,22 @@ export default function AddMemberScreen() {
     const { name, lastName, phone, email, address, city,
             stateName, pincode, height, weight, emgName, emgPhone } = form;
 
-    if (!name || !lastName || !phone || !email || !address || !city ||
-        !stateName || !pincode || !membershipType || !height || !weight || !emgName) {
-      alert("All fields are mandatory"); return false;
-    }
-    if (phone.length < 10 || emgPhone.length < 10) {
-      alert("Enter valid phone number"); return false;
-    }
-    if (isCustomDuration && !customDays) {
-      alert("Enter number of days"); return false;
-    }
+    if (!name) { alert("First name is required"); return false; }
+    if (!lastName) { alert("Last name is required"); return false; }
+    if (!phone) { alert("Mobile number is required"); return false; }
+    if (phone.length !== 10) { alert("Mobile number must be exactly 10 digits"); return false; }
+    if (!email) { alert("Email is required"); return false; }
+    if (!address) { alert("Address is required"); return false; }
+    if (!city) { alert("City is required"); return false; }
+    if (!stateName) { alert("State is required"); return false; }
+    if (!pincode) { alert("Pincode is required"); return false; }
+    if (!membershipType) { alert("Membership type is required"); return false; }
+    if (!height) { alert("Height is required"); return false; }
+    if (!weight) { alert("Weight is required"); return false; }
+    if (!emgName) { alert("Emergency contact name is required"); return false; }
+    if (!emgPhone) { alert("Emergency phone is required"); return false; }
+    if (emgPhone.length < 10) { alert("Emergency phone must be at least 10 digits"); return false; }
+    if (isCustomDuration && !customDays) { alert("Enter number of days"); return false; }
     return true;
   }, [form, membershipType, isCustomDuration, customDays]);
 
@@ -258,15 +264,19 @@ export default function AddMemberScreen() {
             <Text style={styles.sectionTitle}>Personal Details</Text>
             <Field placeholder="First Name" value={form.name}     onChangeText={set("name")}     maxLength={50} />
             <Field placeholder="Last Name"  value={form.lastName} onChangeText={set("lastName")} maxLength={50} />
-            <View style={styles.phoneRow}>
-              <View style={styles.codeBoxCompact}><Text style={styles.codeText}>+91</Text></View>
-              <Field
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 14, marginBottom: 0, gap: 0 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#E6EAF0', borderRadius: 10, height: 44, paddingHorizontal: 12, marginRight: 8 }}>
+                <Text style={{ fontSize: 16, color: '#0A1E5E', fontWeight: '600' }}>+91</Text>
+              </View>
+              <TextInput
+                style={{ flex: 1, height: 44, backgroundColor: '#E6EAF0', borderRadius: 10, fontSize: 16, color: '#0A1E5E', paddingHorizontal: 14 }}
                 placeholder="Mobile Number"
-                style={styles.phoneInput}
+                placeholderTextColor="#6c7587"
                 keyboardType="phone-pad"
                 value={form.phone}
                 onChangeText={(text) => {
-                  const numeric = text.replace(/[^0-9]/g, "");
+                  let numeric = text.replace(/[^0-9]/g, "");
+                  if (numeric.length > 10) numeric = numeric.slice(0, 10);
                   set("phone")(numeric);
                 }}
                 maxLength={10}
@@ -315,7 +325,12 @@ export default function AddMemberScreen() {
                 onValueChange={val => set("stateName")(val ?? "")}
                 items={stateOptions}
                 value={form.stateName}
-                style={pickerStyles}
+                style={{
+                  ...pickerStyles,
+                  inputIOS: { ...pickerStyles.inputIOS, ...styles.input },
+                  inputAndroid: { ...pickerStyles.inputAndroid, ...styles.input },
+                  inputWeb: { ...pickerStyles.inputWeb, ...styles.input },
+                }}
                 placeholder={{ label: "Select State", value: null, color: "#0A1E5E" }}
               />
             </View>
@@ -324,7 +339,12 @@ export default function AddMemberScreen() {
                 onValueChange={val => set("city")(val ?? "")}
                 items={cityOptions}
                 value={form.city}
-                style={pickerStyles}
+                style={{
+                  ...pickerStyles,
+                  inputIOS: { ...pickerStyles.inputIOS, ...styles.input },
+                  inputAndroid: { ...pickerStyles.inputAndroid, ...styles.input },
+                  inputWeb: { ...pickerStyles.inputWeb, ...styles.input },
+                }}
                 placeholder={{ label: "Select City", value: null, color: "#0A1E5E" }}
               />
             </View>
@@ -333,7 +353,12 @@ export default function AddMemberScreen() {
                 onValueChange={setMembershipType}
                 items={membershipOptions}
                 value={membershipType}
-                style={pickerStyles}
+                style={{
+                  ...pickerStyles,
+                  inputIOS: { ...pickerStyles.inputIOS, ...styles.input },
+                  inputAndroid: { ...pickerStyles.inputAndroid, ...styles.input },
+                  inputWeb: { ...pickerStyles.inputWeb, ...styles.input },
+                }}
                 placeholder={{ label: "Select Membership Type", value: null, color: "#0A1E5E" }}
               />
             </View>

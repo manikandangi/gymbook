@@ -9,7 +9,7 @@ const ManageStaff: React.FC = () => {
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
 
       {/* Header */}
-      <AppHeader title="Manage Staff" showSettings={false} showCall={false} showBack />
+      <AppHeader title="Manage Staff" showSettings showCall onSettingsPress={() => {}} onCallPress={() => {}} />
 
       {/* Staff Card */}
       <View style={styles.card}>

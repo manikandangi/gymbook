@@ -48,7 +48,7 @@ const ManagePlans: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <AppHeader title="Manage Plans" showSettings={false} showCall={false} showBack />
+      <AppHeader title="Manage Plans" showSettings showCall onSettingsPress={() => {}} onCallPress={() => {}} />
 
       {/* Tabs */}
       <View style={styles.tabs}>

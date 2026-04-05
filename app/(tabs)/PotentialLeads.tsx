@@ -11,7 +11,7 @@ const PotentialLeads: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <AppHeader title="Potential Leads" showSettings={false} showCall={false} showBack />
+      <AppHeader title="Potential Leads" showSettings showCall onSettingsPress={() => {}} onCallPress={() => {}} />
 
       {/* ================= SEARCH + ACTIONS ================= */}
       <View style={styles.searchRow}>

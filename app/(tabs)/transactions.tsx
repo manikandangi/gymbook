@@ -32,7 +32,7 @@ export default function TransactionsScreen() {
       <View style={styles.container}>
 
         {/* Header */}
-        <AppHeader title="Transactions" showSettings={false} showCall={false} />
+        <AppHeader title="Transactions" showSettings showCall onSettingsPress={() => {}} onCallPress={() => {}} />
 
         {/* Filters */}
         <View style={styles.filterRow}>
