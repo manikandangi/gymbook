@@ -258,11 +258,11 @@ export default function AddMemberScreen() {
             <Text style={styles.sectionTitle}>Personal Details</Text>
             <Field placeholder="First Name" value={form.name}     onChangeText={set("name")}     maxLength={50} />
             <Field placeholder="Last Name"  value={form.lastName} onChangeText={set("lastName")} maxLength={50} />
-            <View style={[styles.row, { alignItems: 'center' }]}> 
-              <View style={styles.codeBox}><Text>+91</Text></View>
+            <View style={styles.phoneRow}>
+              <View style={styles.codeBoxCompact}><Text style={styles.codeText}>+91</Text></View>
               <Field
-                placeholder="Phone"
-                style={{ flex: 1, marginLeft: 8 }}
+                placeholder="Mobile Number"
+                style={styles.phoneInput}
                 keyboardType="phone-pad"
                 value={form.phone}
                 onChangeText={(text) => {
@@ -350,8 +350,26 @@ export default function AddMemberScreen() {
 
             {/* Section: Health */}
             <Text style={styles.sectionTitle}>Health</Text>
-            <Field placeholder="Height (cm)" value={form.height} onChangeText={set("height")} maxLength={5} />
-            <Field placeholder="Weight (kg)" value={form.weight} onChangeText={set("weight")} maxLength={5} />
+            <Field
+              placeholder="Height (cm)"
+              value={form.height}
+              onChangeText={text => {
+                const numeric = text.replace(/[^0-9]/g, "");
+                set("height")(numeric);
+              }}
+              keyboardType="numeric"
+              maxLength={5}
+            />
+            <Field
+              placeholder="Weight (kg)"
+              value={form.weight}
+              onChangeText={text => {
+                const numeric = text.replace(/[^0-9]/g, "");
+                set("weight")(numeric);
+              }}
+              keyboardType="numeric"
+              maxLength={5}
+            />
             <View style={styles.divider} />
 
             {/* Section: Emergency */}
@@ -451,11 +469,10 @@ const styles = StyleSheet.create({
     marginTop: 14, border: "none", backgroundColor: "#E6EAF0",
   },
   row:             { flexDirection: "row", gap: 10, marginTop: 14 },
-  codeBox: {
-    width: 70, height: 50, backgroundColor: "#E6EAF0",
-    borderRadius: 10, justifyContent: "center",
-    alignItems: "center",
-  },
+  phoneRow:        { flexDirection: "row", alignItems: "center", marginTop: 14, marginBottom: 0 },
+  codeBoxCompact:  { width: 54, height: 44, backgroundColor: "#E6EAF0", borderRadius: 10, justifyContent: "center", alignItems: "center", marginRight: 8 },
+  codeText:        { fontSize: 16, color: "#0A1E5E", fontWeight: "600" },
+  phoneInput:      { flex: 1, marginLeft: 0, height: 44, marginTop: 0, fontSize: 16 },
   dropdownWrapper: {
     backgroundColor: "#E6EAF0",
     borderRadius: 10,

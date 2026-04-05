@@ -4,6 +4,8 @@ import { LogOut, User } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
     Alert,
+    Platform,
+    SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
@@ -50,27 +52,24 @@ export default function ProfileScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView 
+    <SafeAreaView style={styles.container}>
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* <View style={styles.header}>
+        <View style={styles.headerSection}>
           <View style={styles.avatarContainer}>
             <User size={48} color="#fff" strokeWidth={2} />
           </View>
           <Text style={styles.name}>Gym Admin</Text>
           <View style={styles.membershipBadge}>
-            <Text style={[styles.membershipText, { color: "#FFD700" }]}> 
-              Administrator
-            </Text>
+            <Text style={[styles.membershipText, { color: "#FFD700" }]}>Administrator</Text>
           </View>
-        </View> */}
+        </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account Information</Text>
-          
           <View style={styles.infoCard}>
             <View style={styles.infoRow}>
               <View style={styles.infoIconContainer}>
@@ -81,17 +80,41 @@ export default function ProfileScreen() {
                 <Text style={styles.infoValue}>{userId}</Text>
               </View>
             </View>
+            <View style={styles.infoRow}>
+              <View style={styles.infoIconContainer}>
+                <Ionicons name="mail-outline" size={20} color="#ff3b30" />
+              </View>
+              <View style={styles.infoContent}>
+                <Text style={styles.infoLabel}>Email</Text>
+                <Text style={styles.infoValue}>admin@gymbook.com</Text>
+              </View>
+            </View>
+            <View style={styles.infoRow}>
+              <View style={styles.infoIconContainer}>
+                <Ionicons name="call-outline" size={20} color="#ff3b30" />
+              </View>
+              <View style={styles.infoContent}>
+                <Text style={styles.infoLabel}>Phone</Text>
+                <Text style={styles.infoValue}>+91 98765 43210</Text>
+              </View>
+            </View>
           </View>
         </View>
 
         <View style={styles.section}>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <LogOut size={20} color="#fff" />
-            <Text style={styles.logoutText}>Logout</Text>
-          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>About</Text>
+          <Text style={styles.aboutText}>
+            Welcome to GYMbook! Manage your gym, staff, and members efficiently. For support, contact us at support@gymbook.com.
+          </Text>
         </View>
       </ScrollView>
-    </View>
+      <View style={styles.logoutContainer}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <LogOut size={20} color="#fff" />
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -188,6 +211,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '500',
   },
+  logoutContainer: {
+    padding: 16,
+    backgroundColor: 'transparent',
+    ...Platform.select({
+      ios: { paddingBottom: 24 },
+      android: { paddingBottom: 16 },
+    }),
+  },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -195,12 +226,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#ff3b30',
     paddingVertical: 16,
     borderRadius: 12,
-    marginHorizontal: 24,
+    marginHorizontal: 0,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   logoutText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
+    letterSpacing: 0.5,
+  },
+  aboutText: {
+    color: '#ccc',
+    fontSize: 15,
+    lineHeight: 22,
+    marginTop: 4,
+  },
+  headerSection: {
+    alignItems: 'center',
+    paddingTop: 40,
+    paddingBottom: 32,
+    paddingHorizontal: 24,
   },
 });
