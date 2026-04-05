@@ -33,7 +33,7 @@ jobs:
         run: expo build:android -t apk --non-interactive
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: expo-apk
           path: dist/*.apk
