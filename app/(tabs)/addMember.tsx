@@ -283,6 +283,25 @@ export default function AddMemberScreen() {
               />
             </View>
             <Field placeholder="Email" value={form.email} onChangeText={set("email")} maxLength={50} />
+            {/* Gender Dropdown */}
+            <View style={styles.dropdownWrapper}>
+              <RNPickerSelect
+                onValueChange={val => set("gender")(val ?? "")}
+                items={[
+                  { label: "Male", value: "Male" },
+                  { label: "Female", value: "Female" },
+                  { label: "Other", value: "Other" },
+                ]}
+                value={form.gender}
+                style={{
+                  ...pickerStyles,
+                  inputIOS: { ...pickerStyles.inputIOS, ...styles.input },
+                  inputAndroid: { ...pickerStyles.inputAndroid, ...styles.input },
+                  inputWeb: { ...pickerStyles.inputWeb, ...styles.input },
+                }}
+                placeholder={{ label: "Select Gender", value: null, color: "#0A1E5E" }}
+              />
+            </View>
             {Platform.OS === "web" ? (
               <input
                 type="date"
@@ -429,24 +448,33 @@ export default function AddMemberScreen() {
 /* ── Styles ── */
 const pickerStyles = {
   inputIOS: {
-    padding: 14,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
     color: "#0A1E5E",
     backgroundColor: "#E6EAF0",
     borderRadius: 10,
+    fontSize: 13,
+    minHeight: 28, // Reduced height
   },
   inputAndroid: {
-    padding: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
     color: "#0A1E5E",
     backgroundColor: "#E6EAF0",
     borderRadius: 10,
+    fontSize: 13,
+    minHeight: 28, // Reduced height
   },
   inputWeb: {
-    padding: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
     borderWidth: 0,
     outlineWidth: 0,
     color: "#0A1E5E",
     backgroundColor: "#E6EAF0",
     borderRadius: 10,
+    fontSize: 13,
+    minHeight: 28, // Reduced height
   },
 };
 
@@ -501,7 +529,7 @@ const styles = StyleSheet.create({
   dropdownWrapper: {
     backgroundColor: "#E6EAF0",
     borderRadius: 10,
-    marginTop: 14,
+    marginTop: 14, // Added to give space above dropdown
     justifyContent: "center",
     minHeight: 54,
     paddingHorizontal: 10,

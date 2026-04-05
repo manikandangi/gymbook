@@ -6,7 +6,7 @@ const ReportsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <AppHeader title="Reports" showSettings showCall />
+      <AppHeader title="Reports" showSettings showCall onSettingsPress={() => {}} onCallPress={() => {}} />
 
       {/* Filters */}
       <View style={styles.filters}>

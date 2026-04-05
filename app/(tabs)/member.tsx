@@ -52,7 +52,7 @@ export default function MemberScreen() {
       phone: item.phone_number,
       plan: "One month plan",
       expired: new Date(item.expiry_date) < new Date(),
-      avatar: "https://i.pravatar.cc/150",
+      avatar: item.avatar_url || "https://i.pravatar.cc/150", // Use user's image if available
       expiryDate: item.expiry_date,
     }));
     setMembers(formattedData);

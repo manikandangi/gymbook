@@ -3,13 +3,13 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-    Platform,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Platform,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from "../supabaseClient";
@@ -19,6 +19,8 @@ export default function HomeScreen() {
 
   const [dashboard, setDashboard] = useState<any>({});
   const [loading, setLoading] = useState(false);
+  const [birthdays, setBirthdays] = useState<any[]>([]);
+  const [loadingBirthdays, setLoadingBirthdays] = useState(false);
 
   const navigate = (path: string, params?: Record<string, string>) => {
     router.push({ pathname: path as any, params });
@@ -27,6 +29,7 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchDashboard();
+      fetchBirthdays();
     }, [])
   );
 
@@ -39,9 +42,21 @@ export default function HomeScreen() {
       setLoading(false);
       return;
     }
-    console.log(data);
     setDashboard(data || {});
     setLoading(false);
+  };
+
+  const fetchBirthdays = async () => {
+    setLoadingBirthdays(true);
+    const { data, error } = await supabase.rpc("ufn_get_today_birthdays");
+    if (error) {
+      console.log("Birthday error:", error);
+      setBirthdays([]);
+      setLoadingBirthdays(false);
+      return;
+    }
+    setBirthdays(data || []);
+    setLoadingBirthdays(false);
   };
 
   return (
@@ -78,6 +93,7 @@ export default function HomeScreen() {
           />
         </View>
 
+
         <View style={styles.row}>
           <WhiteCard
             label="Expiring in 10 days"
@@ -93,8 +109,31 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.singleRow}>
-          <WhiteCard label="Expiring" value={dashboard["expired_members"] || 0}
+          <WhiteCard label="Expirie" value={dashboard["expired_members"] || 0}
             onPress={() => navigate("/(tabs)/member", { userId: "3" })} />
+        </View>
+
+        {/* Today's Birthdays Section - moved below grid */}
+        <View style={{ marginHorizontal: 16, marginBottom: 16 }}>
+          <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 8 }}>Today's Birthdays</Text>
+          {loadingBirthdays ? (
+            <Text style={{ color: "#64748B" }}>Loading...</Text>
+          ) : birthdays.length === 0 ? (
+            <Text style={{ color: "#64748B" }}>No birthdays today.</Text>
+          ) : (
+            birthdays.map((b: any, idx: number) => (
+              <View key={b.member_id || idx} style={{ backgroundColor: "#fff", borderRadius: 10, padding: 12, marginBottom: 8, flexDirection: "row", alignItems: "center" }}>
+                <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: "#E6EAF0", alignItems: "center", justifyContent: "center", marginRight: 12 }}>
+                  <Ionicons name="person-circle" size={40} color="#CBD5E1" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 15, fontWeight: "600" }}>{b.name}</Text>
+                  <Text style={{ color: "#64748B", fontSize: 13 }}>DOB: {b.date_of_birth}</Text>
+                </View>
+                <Ionicons name="cake-outline" size={28} color="#F59E0B" style={{ marginLeft: 8 }} />
+              </View>
+            ))
+          )}
         </View>
 
         {/* Quick Reports */}
