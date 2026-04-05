@@ -1,14 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-  FlatList,
-  SafeAreaView,
-  StyleSheet,
-  Switch,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { FlatList, SafeAreaView, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 import AppHeader from '../../components/AppHeader';
 
 interface Plan {

@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface AppHeaderProps {
   title: string;
@@ -23,8 +24,9 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   onCallPress,
 }) => {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight ?? 24 : insets.top || 24 }]}> 
       {showBack ? (
         <TouchableOpacity onPress={onBackPress || (() => router.back())}>
           <Ionicons name="arrow-back" size={24} style={styles.icon} />

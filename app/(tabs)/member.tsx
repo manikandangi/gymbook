@@ -1,17 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-  ActivityIndicator,
-  FlatList,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import AppHeader from "../../components/AppHeader";
 import BottomNav from "../../components/BottomNav";
 import { supabase } from "../supabaseClient";
@@ -30,7 +19,6 @@ type Member = {
 export default function MemberScreen() {
   const { userId } = useLocalSearchParams();
   const router = useRouter();
-
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
@@ -42,38 +30,31 @@ export default function MemberScreen() {
 
   const fetchMembers = async () => {
     setLoading(true);
-
     const { data, error } = await supabase.rpc(
       "ufn_get_members_by_type",
-      {
-        in_type: Number(userId),
-      }
+      { in_type: Number(userId) }
     );
-
     if (error) {
       console.log("Error:", error);
       setLoading(false);
       return;
     }
     const apiResponse = data;
-
     if (apiResponse?.status !== 1) {
       setMembers([]);
       setLoading(false);
       return;
     }
-    const formattedData: Member[] = (apiResponse.data || []).map(
-      (item: any) => ({
-        id: String(item.member_id),
-        name: `${item.first_name} ${item.last_name}`,
-        code: `#${item.member_code}`,
-        phone: item.phone_number,
-        plan: "One month plan",
-        expired: new Date(item.expiry_date) < new Date(),
-        avatar: "https://i.pravatar.cc/150",
-        expiryDate: item.expiry_date,
-      })
-    );
+    const formattedData: Member[] = (apiResponse.data || []).map((item: any) => ({
+      id: String(item.member_id),
+      name: `${item.first_name} ${item.last_name}`,
+      code: `#${item.member_code}`,
+      phone: item.phone_number,
+      plan: "One month plan",
+      expired: new Date(item.expiry_date) < new Date(),
+      avatar: "https://i.pravatar.cc/150",
+      expiryDate: item.expiry_date,
+    }));
     setMembers(formattedData);
     setLoading(false);
   };
@@ -96,19 +77,14 @@ export default function MemberScreen() {
     >
       <View style={styles.card}>
         <Image source={{ uri: item.avatar }} style={styles.avatar} />
-
         <View style={{ flex: 1 }}>
           <Text style={styles.name}>
             {item.name} <Text style={styles.code}>{item.code}</Text>
           </Text>
-
           <Text style={styles.phone}>{item.phone}</Text>
-
           <View style={styles.divider} />
-
           <View style={styles.row}>
             <Text style={styles.plan}>{item.plan}</Text>
-
             {item.expired && (
               <View style={styles.expiredBadge}>
                 <View style={styles.dot} />
@@ -122,60 +98,51 @@ export default function MemberScreen() {
   );
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <SafeAreaView style={{ flex: 1 }}>
-        {/* Header */}
-        <AppHeader title="Members" showSettings onSettingsPress={() => router.push('/(tabs)/profile')} showCall onCallPress={() => {}} />
-
-        {/* Search */}
-        <View style={styles.searchRow}>
-          <TextInput
-            placeholder="Search for name or phone"
-            placeholderTextColor="#9AA4B2"
-            style={styles.searchInput}
-            value={searchText}
-            onChangeText={setSearchText}
-          />
-          <TouchableOpacity style={styles.squareBtn} onPress={() => router.push("/(tabs)/addMember")}> 
-            <Text style={styles.squareBtnText}>＋</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.squareBtnOutline} />
-        </View>
-
-        {/* Filters */}
-        <View style={styles.filterRow}>
-          <View style={styles.filterChip}>
-            <Text style={styles.filterText}>Expired in last 30 days</Text>
-          </View>
-          <View style={styles.filterChip}>
-            <Text style={styles.filterText}>Sorted By Expiry - Desc</Text>
-          </View>
-        </View>
-
-        {/* Count */}
-        <Text style={styles.showing}>
-          {loading ? "Loading..." : `Showing ${filteredMembers.length} Members`}
-        </Text>
-
-        {/* Loader or List */}
-        {loading ? (
-          <ActivityIndicator size="large" style={{ marginTop: 40 }} />
-        ) : (
-          <FlatList
-            data={filteredMembers}
-            keyExtractor={(item) => item.id}
-            renderItem={renderItem}
-            contentContainerStyle={{ paddingBottom: 120 }}
-            showsVerticalScrollIndicator={false}
-          />
-        )}
-        {/* Footer */}
-        <BottomNav />
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+    <View style={{ flex: 1, backgroundColor: '#F6F8FB' }}>
+      {/* Fixed Header */}
+      <AppHeader title="Members" showSettings onSettingsPress={() => router.push('/(tabs)/profile')} showCall onCallPress={() => {}} />
+      {/* Scrollable Content */}
+      <View style={{ flex: 1 }}>
+        <FlatList
+          data={filteredMembers}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          ListHeaderComponent={
+            <>
+              <View style={styles.searchRow}>
+                <TextInput
+                  placeholder="Search for name or phone"
+                  placeholderTextColor="#9AA4B2"
+                  style={styles.searchInput}
+                  value={searchText}
+                  onChangeText={setSearchText}
+                />
+                <TouchableOpacity style={styles.squareBtn} onPress={() => router.push("/(tabs)/addMember")}> 
+                  <Text style={styles.squareBtnText}>＋</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.squareBtnOutline} />
+              </View>
+              <View style={styles.filterRow}>
+                <View style={styles.filterChip}>
+                  <Text style={styles.filterText}>Expired in last 30 days</Text>
+                </View>
+                <View style={styles.filterChip}>
+                  <Text style={styles.filterText}>Sorted By Expiry - Desc</Text>
+                </View>
+              </View>
+              <Text style={styles.showing}>
+                {loading ? "Loading..." : `Showing ${filteredMembers.length} Members`}
+              </Text>
+              {loading && <ActivityIndicator size="large" style={{ marginTop: 40 }} />}
+            </>
+          }
+          contentContainerStyle={{ paddingBottom: 120 }}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
+      {/* Fixed Footer */}
+      <BottomNav />
+    </View>
   );
 }
 

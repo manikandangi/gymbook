@@ -1,12 +1,5 @@
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import AppHeader from '../../components/AppHeader';
 
 const ReportsScreen: React.FC = () => {
