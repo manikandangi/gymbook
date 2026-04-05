@@ -1,0 +1,41 @@
+name: Build Android APK with EAS CLI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    env:
+      EAS_EMAIL: ${{ secrets.EAS_EMAIL }}
+      EAS_PASSWORD: ${{ secrets.EAS_PASSWORD }}
+      EAS_TOKEN: ${{ secrets.EAS_TOKEN }}
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Authenticate with EAS
+        run: eas login --token $EAS_TOKEN
+
+      - name: Build APK
+        run: eas build -p android --profile preview --non-interactive
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: eas-apk
+          path: dist/*.apk
