@@ -4,8 +4,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView,
-  StyleSheet, Text, TextInput, TouchableOpacity, View
+    Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView,
+    StyleSheet, Text, TextInput, TouchableOpacity, View
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { supabase } from "../supabaseClient";
@@ -258,11 +258,11 @@ export default function AddMemberScreen() {
             <Text style={styles.sectionTitle}>Personal Details</Text>
             <Field placeholder="First Name" value={form.name}     onChangeText={set("name")}     maxLength={50} />
             <Field placeholder="Last Name"  value={form.lastName} onChangeText={set("lastName")} maxLength={50} />
-            <View style={styles.row}>
+            <View style={[styles.row, { alignItems: 'center' }]}> 
               <View style={styles.codeBox}><Text>+91</Text></View>
               <Field
                 placeholder="Phone"
-                style={{ flex: 1 }}
+                style={{ flex: 1, marginLeft: 8 }}
                 keyboardType="phone-pad"
                 value={form.phone}
                 onChangeText={(text) => {
@@ -357,11 +357,11 @@ export default function AddMemberScreen() {
             {/* Section: Emergency */}
             <Text style={styles.sectionTitle}>Emergency Contact</Text>
             <Field placeholder="Emergency Name"  value={form.emgName}  onChangeText={set("emgName")}  maxLength={50} />
-            <View style={styles.row}>
+            <View style={[styles.row, { alignItems: 'center' }]}> 
               <View style={styles.codeBox}><Text>+91</Text></View>
               <Field
                 placeholder="Emergency Phone"
-                style={{ flex: 1 }}
+                style={{ flex: 1, marginLeft: 8 }}
                 keyboardType="phone-pad"
                 value={form.emgPhone}
                 onChangeText={(text) => {

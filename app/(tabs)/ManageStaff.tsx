@@ -1,13 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import {
-    SafeAreaView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
+import AppHeader from '../../components/AppHeader';
 
 const ManageStaff: React.FC = () => {
   return (
@@ -15,17 +15,7 @@ const ManageStaff: React.FC = () => {
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
 
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>Manage Staff</Text>
-
-        <TouchableOpacity>
-          <Ionicons name="ellipsis-vertical" size={22} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <AppHeader title="Manage Staff" showSettings={false} showCall={false} showBack />
 
       {/* Staff Card */}
       <View style={styles.card}>

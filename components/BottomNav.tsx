@@ -1,18 +1,24 @@
 // components/BottomNav.tsx
+
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomSheetWithFAB from '../app/(tabs)/BottomSheetPopup';
 import NavItem from './NavItem';
 
+import { usePathname } from "expo-router";
+
 const BottomNav: React.FC = () => {
+  const insets = useSafeAreaInsets();
+  const pathname = usePathname();
   return (
-    <View style={styles.outerShadow}>
+    <View style={[styles.outerShadow, { paddingBottom: insets.bottom }]}> 
       <View style={styles.bottomNav}>
-        <NavItem icon="home-outline" label="Dashboard" active href="/(tabs)"/>
-        <NavItem icon="people-outline" label="Members" href="/(tabs)/member?userId=0" />
+        <NavItem icon="home-outline" label="Dashboard" active={pathname === '/(tabs)'} href="/(tabs)"/>
+        <NavItem icon="people-outline" label="Members" active={pathname?.startsWith('/(tabs)/member')} href="/(tabs)/member?userId=0" />
         <View style={styles.fabContainer}><BottomSheetWithFAB /></View>
-        <NavItem icon="card-outline" label="Transactions" href="/(tabs)/transactions"/>
-        <NavItem icon="stats-chart-outline" label="Reports" href="/(tabs)/reports"/>
+        <NavItem icon="card-outline" label="Transactions" active={pathname?.startsWith('/(tabs)/transactions')} href="/(tabs)/transactions"/>
+        <NavItem icon="stats-chart-outline" label="Reports" active={pathname?.startsWith('/(tabs)/reports')} href="/(tabs)/reports"/>
       </View>
     </View>
   );

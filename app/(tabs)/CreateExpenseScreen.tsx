@@ -2,13 +2,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from 'expo-router';
 import React, { useState } from "react";
 import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const PAYMENT_TYPES = [
   "Cash",
@@ -23,9 +24,10 @@ export default function CreateExpenseScreen() {
   const [payment, setPayment] = useState("Cash");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
+  const insets = useSafeAreaInsets();
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView style={[styles.container, { paddingBottom: insets.bottom }]} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
        <TouchableOpacity onPress={() => router.back()} style={styles.headerSide}>
                  <Text style={styles.closeIcon}>✕</Text>

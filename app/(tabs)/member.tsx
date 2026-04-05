@@ -1,6 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
   ActivityIndicator,
   FlatList,
   Image,
@@ -13,6 +12,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import AppHeader from "../../components/AppHeader";
+import BottomNav from "../../components/BottomNav";
 import { supabase } from "../supabaseClient";
 
 type Member = {
@@ -46,7 +47,7 @@ export default function MemberScreen() {
       "ufn_get_members_by_type",
       {
         in_type: Number(userId),
-  export default function MemberScreen() {
+      }
     );
 
     if (error) {
@@ -127,9 +128,7 @@ export default function MemberScreen() {
     >
       <SafeAreaView style={{ flex: 1 }}>
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Members</Text>
-        </View>
+        <AppHeader title="Members" showSettings onSettingsPress={() => router.push('/(tabs)/profile')} showCall onCallPress={() => {}} />
 
         {/* Search */}
         <View style={styles.searchRow}>
@@ -137,15 +136,13 @@ export default function MemberScreen() {
             placeholder="Search for name or phone"
             placeholderTextColor="#9AA4B2"
             style={styles.searchInput}
-          value={searchText}
-          onChangeText={setSearchText}
-        />
-
-      <View style={[styles.container, { paddingTop: 16, paddingBottom: 24 }]}> 
-          <Text style={styles.squareBtnText}>＋</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.squareBtnOutline} />
+            value={searchText}
+            onChangeText={setSearchText}
+          />
+          <TouchableOpacity style={styles.squareBtn} onPress={() => router.push("/(tabs)/addMember")}> 
+            <Text style={styles.squareBtnText}>＋</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.squareBtnOutline} />
         </View>
 
         {/* Filters */}
@@ -153,7 +150,6 @@ export default function MemberScreen() {
           <View style={styles.filterChip}>
             <Text style={styles.filterText}>Expired in last 30 days</Text>
           </View>
-
           <View style={styles.filterChip}>
             <Text style={styles.filterText}>Sorted By Expiry - Desc</Text>
           </View>
@@ -176,6 +172,8 @@ export default function MemberScreen() {
             showsVerticalScrollIndicator={false}
           />
         )}
+        {/* Footer */}
+        <BottomNav />
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
@@ -192,7 +190,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
 
-        </View>
+  title: {
     fontSize: 24,
     fontWeight: "700",
     color: "#0B1B3A",

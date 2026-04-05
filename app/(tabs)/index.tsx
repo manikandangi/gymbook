@@ -3,17 +3,19 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-  Platform,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    Platform,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from "react-native";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from "../supabaseClient";
 export default function HomeScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const [dashboard, setDashboard] = useState<any>({});
   const [loading, setLoading] = useState(false);
@@ -43,7 +45,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: insets.bottom }]}> 
       <StatusBar barStyle="dark-content" backgroundColor="#F5F6FA" />
       {/* Header */}
       <View style={styles.header}>

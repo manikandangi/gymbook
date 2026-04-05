@@ -1,12 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import {
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-} from 'react-native';
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AppHeader from '../../components/AppHeader';
 
 const ExpensesScreen: React.FC = () => {
   const handleNewExpense = () => {
@@ -21,14 +17,11 @@ const ExpensesScreen: React.FC = () => {
     console.log('Open Expenses Details');
   };
 
+  const insets = useSafeAreaInsets();
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { paddingBottom: insets.bottom }]}> 
       {/* Header */}
-      <View style={styles.header}>
-        <Ionicons name="arrow-back" size={24} />
-        <Text style={styles.headerTitle}>Expenses</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <AppHeader title="Expenses" showSettings onSettingsPress={() => {}} showCall={false} showBack />
 
       {/* Top Buttons */}
       <View style={styles.topButtons}>

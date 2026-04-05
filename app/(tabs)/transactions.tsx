@@ -1,13 +1,14 @@
 import React from 'react';
 import {
-  FlatList,
-  Image,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View
+    FlatList,
+    Image,
+    SafeAreaView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    View
 } from 'react-native';
+import AppHeader from '../../components/AppHeader';
 
 const transactions = [
   {
@@ -31,14 +32,7 @@ export default function TransactionsScreen() {
       <View style={styles.container}>
 
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Transactions</Text>
-          <View style={styles.headerRight}>
-            <View style={styles.iconPlaceholder} />
-            <View style={styles.iconPlaceholder} />
-            <View style={styles.iconPlaceholder} />
-          </View>
-        </View>
+        <AppHeader title="Transactions" showSettings={false} showCall={false} />
 
         {/* Filters */}
         <View style={styles.filterRow}>

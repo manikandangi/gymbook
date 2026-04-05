@@ -1,14 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import AppHeader from '../../components/AppHeader';
 
 const PotentialLeads: React.FC = () => {
   const router = useRouter();
@@ -16,16 +16,8 @@ const PotentialLeads: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* ================= HEADER ================= */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>Potential Leads</Text>
-
-        <View style={{ width: 24 }} />
-      </View>
+      {/* Header */}
+      <AppHeader title="Potential Leads" showSettings={false} showCall={false} showBack />
 
       {/* ================= SEARCH + ACTIONS ================= */}
       <View style={styles.searchRow}>

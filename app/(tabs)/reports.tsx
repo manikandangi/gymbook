@@ -1,6 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -8,18 +7,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import AppHeader from '../../components/AppHeader';
 
 const ReportsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Reports</Text>
-        <View style={styles.headerIcons}>
-          <Ionicons name="call-outline" size={22} style={styles.icon} />
-          <Ionicons name="settings-outline" size={22} style={styles.icon} />
-        </View>
-      </View>
+      <AppHeader title="Reports" showSettings showCall />
 
       {/* Filters */}
       <View style={styles.filters}>

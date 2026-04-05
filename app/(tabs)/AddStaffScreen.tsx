@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+
 import React from "react";
 import {
     KeyboardAvoidingView,
@@ -11,12 +12,14 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const AddStaffScreen: React.FC = () => {
   const router = useRouter();
 
+  const insets = useSafeAreaInsets();
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={[styles.safe, { paddingBottom: insets.bottom }]}> 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
